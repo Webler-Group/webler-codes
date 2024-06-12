@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id BigInt @id @default(autoincrement())
+
+  email String @unique @db.VarChar(60)
+  username String @unique @db.VarChar(20)
+  emailVerified Boolean @default(false)
+  roles Role[]
+
+  nickname String? @db.VarChar(30)
+  bio String @default("") @db.VarChar(300)
+  location String? @db.VarChar(30)
+  workplace String? @db.VarChar(30)
+
+  posts Post[] @relation(name: "posts")
+  discussions Discussion[] @relation(name: "discussions")
+  watchedDiscussions Discussion[] @relation(name: "watchedDiscussions")
+  tags Tag[] @relation(name: "tags")
+  authoredReports Report[] @relation(name: "authoredReports")
+  receivedReports Report[] @relation(name: "receivedReports")
+  upvotes Upvote[]
+
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+}
+
+model Upvote {
+  id BigInt @id @default(autoincrement())
+
+  user User @relation(references: [id], fields: [userId])
+  userId BigInt
+
+
+}
+
+model Discussion {
+  id BigInt @id @default(autoincrement())
+
+  author User @relation(name: "discussions", references: [id], fields: [authorId])
+  authorId BigInt
+  watchers User[] @relation(name: "watchedDiscussions")
+  tags Tag[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Tag {
+  id BigInt @id @default(autoincrement())
+
+  name String @unique
+  author User @relation(name: "tags", references: [id], fields: [authorId])
+  authorId BigInt
+
+  discussions Discussion[]
+}
+
+model Post {
+  id BigInt @id @default(autoincrement())
+
+  type PostType
+  author User @relation(name: "posts", references: [id], fields: [authorId])
+  authorId BigInt
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum PostType {
+  ANSWER
+  COMMENT
+}
+
+model Report {
+  id BigInt @id @default(autoincrement())
+
+  reportedUser User @relation(name: "receivedReports", references: [id], fields: [reportedUserId])
+  reportedUserId BigInt
+  author User @relation(name: "authoredReports", references: [id], fields: [authorId])
+  authorId BigInt
+
+  createdAt DateTime @default(now())
+}
+
+model Ban {
+  id BigInt @id @default(autoincrement())
+
+  durationInDays Int
+  permanent Boolean @default(false)
+
+  createdAt DateTime @default(now())
+}

@@ -1,0 +1,34 @@
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=webler_user
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=webler_localhost_db
+    ports:
+      - "5432:5432"
+  backend:
+    container_name: backend
+    depends_on:
+      - postgres
+    build:
+      context: .
+      dockerfile: ./.docker/Dockerfile-backend
+    environment:
+      NODE_ENV: development
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./:/var/www/webler-codes:ro
+  nginx:
+    container_name: nginx
+    depends_on:
+      - backend
+    build:
+      dockerfile: ./.docker/Dockerfile-nginx
+    volumes:
+      - ./:/var/www/webler-codes:ro
+    ports:
+      - 8080:8080
+    
