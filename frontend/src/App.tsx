@@ -1,27 +1,39 @@
 import type { Component } from 'solid-js';
 
-import logo from './logo.svg';
-import styles from './App.module.css';
+import { createSignal, createResource, Switch, Match, Show } from "solid-js";
 
-const App: Component = () => {
+const fetchUser = async (id: number) =>
+ {
+  const response = await fetch('/api');
+  return response.json();
+}
+
+function App() {
+  const [userId, setUserId] = createSignal<number>();
+  const [user] = createResource(userId, fetchUser);
+
   return (
-    <div class={styles.App}>
-      <header class={styles.header}>
-        <img src={logo} class={styles.logo} alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          class={styles.link}
-          href="https://github.com/solidjs/solid"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Create Webler
-        </a>
-      </header>
+    <div>
+      <input
+        type="number"
+        min="1"
+        placeholder="Enter Numeric Id"
+        onInput={(e) => setUserId(+e.currentTarget.value)}
+      />
+      <Show when={user.loading}>
+        <p>Loading...</p>
+      </Show>
+      <Switch>
+        <Match when={user.error}>
+          <span>Error: </span>
+        </Match>
+        <Match when={user()}>
+          <div>{JSON.stringify(user())}</div>
+        </Match>
+      </Switch>
+
     </div>
   );
-};
+}
 
 export default App;

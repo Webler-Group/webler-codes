@@ -1,6 +1,5 @@
 services:
   postgres:
-    container_name: postgres
     image: postgres:16
     environment:
       - POSTGRES_USER=webler_user
@@ -9,7 +8,6 @@ services:
     ports:
       - "5432:5432"
   backend:
-    container_name: backend
     depends_on:
       - postgres
     build:
@@ -22,7 +20,6 @@ services:
     volumes:
       - ./:/var/www/webler-codes:ro
   nginx:
-    container_name: nginx
     depends_on:
       - backend
     build:
