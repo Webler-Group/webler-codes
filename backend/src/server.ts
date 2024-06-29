@@ -1,20 +1,16 @@
 import express from 'express';
-import { configDotenv } from 'dotenv';
-
-configDotenv();
-
-const port = process.env.PORT;
+import { API_PREFIX, APP_PORT } from './utils/globals';
+import authRouter from './routes/authRoute';
+import { errorMiddleware } from './middleware/errorMiddleware';
 
 const app = express();
 
-app.use(express.json({ limit: "2mb" }));
+app.use(express.json({ limit: '2mb' }));
 
-app.get('/api', (req, res) => {
-    res.json({
-        message: "Hello World!"
-    });
-});
+app.use(`${API_PREFIX}/auth`, authRouter);
 
-app.listen(port, () => {
-    console.log(`App started listening on port ${port}.`);
+app.use(errorMiddleware);
+
+app.listen(APP_PORT, () => {
+    console.log(`App listening on ${APP_PORT}`);
 });

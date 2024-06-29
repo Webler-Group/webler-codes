@@ -2,6 +2,12 @@ FROM node:20.12.0-alpine
 
 WORKDIR /var/www/webler-codes/backend
 
-EXPOSE ${PORT}
+COPY ./backend/package.json /var/www/webler-codes/backend/package.json
+COPY ./backend/prisma /var/www/webler-codes/backend/prisma
+
+RUN npm install
+RUN npx prisma generate
+
+EXPOSE ${APP_PORT}
 
 CMD ["npm", "run", "dev"]

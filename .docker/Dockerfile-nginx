@@ -1,3 +1,0 @@
-FROM nginx:1.27-alpine
-
-COPY ./.docker/config/nginx/httpd_default.conf /etc/nginx/conf.d/default.conf

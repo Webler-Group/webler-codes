@@ -1,4 +1,4 @@
-import type { Component } from 'solid-js';
+import { createWS } from '@solid-primitives/websocket';
 
 import { createSignal, createResource, Switch, Match, Show } from "solid-js";
 
@@ -11,9 +11,15 @@ const fetchUser = async (id: number) =>
 function App() {
   const [userId, setUserId] = createSignal<number>();
   const [user] = createResource(userId, fetchUser);
+  const ws = createWS("wss://localhost:8080/api");
+
+  const testWs = () => {
+    ws.send("it works");
+  }
 
   return (
     <div>
+      <button onClick={() => testWs()}>Test WS</button>
       <input
         type="number"
         min="1"

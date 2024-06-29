@@ -16,6 +16,7 @@
     "vite-plugin-solid": "^2.8.2"
   },
   "dependencies": {
+    "@solid-primitives/websocket": "^1.2.2",
     "solid-js": "^1.8.11"
   }
 }
