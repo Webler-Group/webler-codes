@@ -6,7 +6,7 @@ services:
       - POSTGRES_PASSWORD=secret
       - POSTGRES_DB=webler_localhost_db
     ports:
-      - 5432:5432
+      - "5432:5432"
   backend:
     depends_on:
       - postgres
@@ -30,6 +30,9 @@ services:
     volumes:
       - ./:/var/www/webler-codes:ro
       - ./.docker/config/nginx/httpd_default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./.docker/certs/server.crt:/etc/nginx/server.crt:ro
+      - ./.docker/certs/server.key:/etc/nginx/server.key:ro
     ports:
-      - 8080:8080
+      - "443:443"
+      - "80:80"
     

@@ -20,10 +20,10 @@ const generateEmailVerificationCode = async (userId: number, username: string, u
     <br>
     Verify your email address with the code bellow:</p>
     <h4>${code}</h4>
-    <p><small>This code expires in ${codeRecord.expiresInMinutes} minutes.</small></p>
+    <p>This code expires in ${codeRecord.expiresInMinutes} minutes.</p>
     <p>With regards,<br>
     <br>
-    your Weblercodes team</p>`;
+    Your Weblercodes team</p>`;
 
     await sendMail(userEmail, 'Account verification', emailHtml);
 }

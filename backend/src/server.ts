@@ -11,6 +11,10 @@ app.use(`${API_PREFIX}/auth`, authRouter);
 
 app.use(errorMiddleware);
 
+app.get('*', (req, res) => {
+    res.status(404).json({ message: 'Not found' });
+});
+
 app.listen(APP_PORT, () => {
     console.log(`App listening on ${APP_PORT}`);
 });
