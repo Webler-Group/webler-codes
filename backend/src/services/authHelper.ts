@@ -1,3 +1,5 @@
+import ForbiddenException from "../exceptions/ForbiddenException";
+import { ErrorCode } from "../exceptions/enums/ErrorCode";
 import { randint } from "../utils/mathUtils";
 import { dbClient } from "./database";
 import { sendMail } from "./email";
@@ -7,7 +9,6 @@ const generateEmailVerificationCode = async (userId: number, username: string, u
     for(let i = 0; i < 6; ++i) {
         code += randint(0, 9);
     }
-    console.log('Code: ' + code);
 
     const codeRecord = await dbClient.verficationCode.create({
         data: {
@@ -28,6 +29,17 @@ const generateEmailVerificationCode = async (userId: number, username: string, u
     await sendMail(userEmail, 'Account verification', emailHtml);
 }
 
+const validateUser = async (userId: number) => {
+    const user = await dbClient.user.findFirst({ where: { id: userId } });
+        
+    if(!user || !user.isVerified) {
+        throw new ForbiddenException('Forbidden', ErrorCode.FORBIDDEN);
+    }
+
+    return user;
+}
+
 export {
-    generateEmailVerificationCode
+    generateEmailVerificationCode,
+    validateUser
 }

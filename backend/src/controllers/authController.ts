@@ -8,8 +8,11 @@ import { ErrorCode } from "../exceptions/enums/ErrorCode";
 import { errorHandler } from "../utils/errorHandler";
 import { loginSchema, registerSchema, resendEmailVerificationCodeSchema, verifyEmailSchema } from "../schemas/authSchemas";
 import NotFoundException from "../exceptions/NotFoundException";
-import { generateEmailVerificationCode } from "../services/authHelper";
+import { generateEmailVerificationCode, validateUser } from "../services/authHelper";
 import { AuthRequest } from "../middleware/authMiddleware";
+import { TokenPayload, clearRefreshTokenCookie, generateAccessToken, generateRefreshToken, setRefreshTokenCookie } from "../utils/tokenUtils";
+import UnauthorizedException from "../exceptions/UnauthorizedException";
+import ForbiddenException from "../exceptions/ForbiddenException";
 
 const register = errorHandler(async (req: Request, res: Response) => {
 
@@ -51,23 +54,30 @@ const login = errorHandler(async (req: Request, res: Response) => {
         throw new NotFoundException('User not found', ErrorCode.USER_NOT_FOUND);
     }
 
+    if(!user.isVerified) {
+        throw new ForbiddenException('User is not verified', ErrorCode.FORBIDDEN);
+    }
+
     if (!bcrypt.compareSync(password, user.password)) {
         throw new BadRequestException('Password is not correct', ErrorCode.INCORRECT_PASSWORD);
     }
+    
+    const { accessToken, info: accessTokenInfo } = generateAccessToken(user.id);
+    const { refreshToken } = generateRefreshToken(user.id);
 
-    const payload = { userId: user.id };
-    const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+    setRefreshTokenCookie(res, { refreshToken });
 
-    const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
+    res.json({ accessToken, accessTokenInfo });
+});
 
-    res.cookie('refreshToken', refreshToken, {
-        secure: true,
-        httpOnly: true,
-        sameSite: 'strict',
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+const logout = errorHandler(async (req: Request, res: Response) => {
+    const refreshToken = req.cookies?.refreshToken;
 
-    res.json({ accessToken, refreshToken });
+    if(refreshToken) {
+        clearRefreshTokenCookie(res);
+    }
+
+    res.json({});
 });
 
 const resendEmailVerificationCode = errorHandler(async (req: Request, res: Response) => {
@@ -127,10 +137,36 @@ const getMe = errorHandler(async (req: AuthRequest, res: Response) => {
     res.json(req.user);
 });
 
+const refreshToken = errorHandler(async (req: Request, res: Response) => {
+    const refreshToken = req.cookies?.refreshToken;
+
+    if(!refreshToken) {
+        throw new UnauthorizedException('Unauthorized', ErrorCode.UNAUTHORIZED);
+    }
+
+    jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, async (errors: jwt.VerifyErrors | null, decoded: any) => {
+        if(errors) {
+            throw new UnauthorizedException('Unauthorized', ErrorCode.UNAUTHORIZED)
+        }
+
+        const user = await validateUser(decoded.userId);
+
+        const { accessToken, info: accessTokenInfo } = generateAccessToken(user.id);
+        const { refreshToken } = generateRefreshToken(user.id);
+
+        setRefreshTokenCookie(res, { refreshToken });
+
+        res.json({ accessToken, accessTokenInfo });
+
+    });
+});
+
 export {
     register,
     login,
     resendEmailVerificationCode,
     verifyEmail,
-    getMe
+    getMe,
+    logout,
+    refreshToken
 }

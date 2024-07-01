@@ -8,6 +8,7 @@ export enum ErrorCode {
     VERIFICATION_CODE_EXPIRED = 1012,
 
     UNAUTHORIZED = 2001,
+    FORBIDDEN = 2002,
 
     UNPROCESSABLE_ENTITY = 3001,
     
