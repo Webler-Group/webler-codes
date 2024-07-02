@@ -5,7 +5,6 @@ import * as jwt from 'jsonwebtoken';
 import { REFRESH_TOKEN_SECRET } from "../utils/globals";
 import BadRequestException from "../exceptions/BadRequestException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
-import { errorHandler } from "../utils/errorHandler";
 import { loginSchema, registerSchema, resendEmailVerificationCodeSchema, verifyEmailSchema } from "../schemas/authSchemas";
 import NotFoundException from "../exceptions/NotFoundException";
 import { generateEmailVerificationCode, validateUser } from "../services/authHelper";
@@ -13,6 +12,7 @@ import { AuthRequest } from "../middleware/authMiddleware";
 import { clearRefreshTokenCookie, generateAccessToken, generateRefreshToken, setRefreshTokenCookie } from "../utils/tokenUtils";
 import UnauthorizedException from "../exceptions/UnauthorizedException";
 import ForbiddenException from "../exceptions/ForbiddenException";
+import { errorHandler } from "../middleware/errorMiddleware";
 
 const register = errorHandler(async (req: Request, res: Response) => {
 

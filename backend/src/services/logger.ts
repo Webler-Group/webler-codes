@@ -1,11 +1,16 @@
 import fs from 'fs';
 import path from 'path';
-import { NODE_ENV } from '../utils/globals';
+import { LOG_DIR, NODE_ENV } from '../utils/globals';
 import { generateRandomFileName } from '../utils/fileUtils';
 
+/**
+ * Creates log file in /logs directory
+ * 
+ * @param content Log file content
+ */
 const writeLogFile = (content: any) => {
     let logFileName = `${generateRandomFileName()}.log`;
-    let dirPath = path.join(__dirname, '../../logs');
+    let dirPath = path.join(__dirname, '../..', LOG_DIR);
 
     if (!fs.existsSync(dirPath)) {
         fs.mkdirSync(dirPath);
