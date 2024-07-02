@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 import { EMAIL_HOST, EMAIL_PASSWORD, EMAIL_PORT, EMAIL_USER } from '../utils/globals';
-import { logEvents } from './logger';
+import { writeLogFile } from './logger';
 
 const mailTransport = nodemailer.createTransport({
     host: EMAIL_HOST,
@@ -14,7 +14,7 @@ const mailTransport = nodemailer.createTransport({
 
 const sendMail = async (to: string[] | string, subject: string, html: string) => {
     const mailOptions = {
-        from: `Weblercodes Team <${EMAIL_USER}>`,
+        from: `Webler Codes Team <${EMAIL_USER}>`,
         to,
         subject,
         html
@@ -23,7 +23,7 @@ const sendMail = async (to: string[] | string, subject: string, html: string) =>
     try {
         await mailTransport.sendMail(mailOptions);
     } catch(error: any) {
-        logEvents(error.stack, 'error.log');
+        writeLogFile(error.stack);
     }
 }
 

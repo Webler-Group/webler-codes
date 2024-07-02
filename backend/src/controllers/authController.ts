@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { dbClient } from "../services/database";
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
-import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from "../utils/globals";
+import { REFRESH_TOKEN_SECRET } from "../utils/globals";
 import BadRequestException from "../exceptions/BadRequestException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
 import { errorHandler } from "../utils/errorHandler";
@@ -10,7 +10,7 @@ import { loginSchema, registerSchema, resendEmailVerificationCodeSchema, verifyE
 import NotFoundException from "../exceptions/NotFoundException";
 import { generateEmailVerificationCode, validateUser } from "../services/authHelper";
 import { AuthRequest } from "../middleware/authMiddleware";
-import { TokenPayload, clearRefreshTokenCookie, generateAccessToken, generateRefreshToken, setRefreshTokenCookie } from "../utils/tokenUtils";
+import { clearRefreshTokenCookie, generateAccessToken, generateRefreshToken, setRefreshTokenCookie } from "../utils/tokenUtils";
 import UnauthorizedException from "../exceptions/UnauthorizedException";
 import ForbiddenException from "../exceptions/ForbiddenException";
 

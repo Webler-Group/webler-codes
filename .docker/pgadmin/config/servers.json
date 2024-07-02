@@ -1,0 +1,13 @@
+{
+    "Servers": {
+        "1": {
+            "Name": "Webler Codes Localhost",
+            "Group": "Servers",
+            "Host": "postgres",
+            "Port": 5432,
+            "MaintenanceDB": "postgres",
+            "Username": "webler_user",
+            "UseSSHTunnel": 0
+        }
+    }
+}

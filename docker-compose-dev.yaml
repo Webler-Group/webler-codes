@@ -1,13 +1,28 @@
 services:
   postgres:
+    container_name: webler-codes-postgres
     image: postgres:16
     environment:
       - POSTGRES_USER=webler_user
       - POSTGRES_PASSWORD=secret
-      - POSTGRES_DB=webler_localhost_db
+      - POSTGRES_DB=webler_codes_localhost_db
     ports:
       - "5432:5432"
+  
+  pgadmin:
+    container_name: webler-codes-pgadmin
+    image: dpage/pgadmin4:8
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@weblercodes.com
+      - PGADMIN_DEFAULT_PASSWORD=secret
+      - PGADMIN_DISABLE_POSTFIX=true
+    volumes:
+      - ./.docker/pgadmin/config/servers.json:/pgadmin4/servers.json:ro
+    ports:
+      - "5050:80"
+
   backend:
+    container_name: webler-codes-backend
     depends_on:
       - postgres
     build:
@@ -18,20 +33,22 @@ services:
     env_file:
       - ./backend/.env
     volumes:
-      - ./backend/package.json:/var/www/webler-codes/backend/package.json
-      - ./backend/src:/var/www/webler-codes/backend/src
-      - ./backend/prisma:/var/www/webler-codes/backend/prisma
-      - ./backend/.env:/var/www/webler-codes/backend/.env
-      - ./backend/logs:/var/www/webler-codes/backend/logs
+      - ./backend/package.json:/var/www/webler-codes/backend/package.json:ro
+      - ./backend/src:/var/www/webler-codes/backend/src:ro
+      - ./backend/.env:/var/www/webler-codes/backend/.env:ro
+      - ./backend/prisma/schema.prisma:/var/www/webler-codes/backend/prisma/schema.prisma:ro
+      - ./backend/prisma/migrations:/var/www/webler-codes/backend/prisma/migrations
+  
   nginx:
+    container_name: webler-codes-nginx
     image: nginx:1.27-alpine
     depends_on:
       - backend
     volumes:
       - ./:/var/www/webler-codes:ro
-      - ./.docker/config/nginx/httpd_default.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./.docker/certs/server.crt:/etc/nginx/server.crt:ro
-      - ./.docker/certs/server.key:/etc/nginx/server.key:ro
+      - ./.docker/nginx/config/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./.docker/nginx/certs/server.crt:/etc/nginx/server.crt:ro
+      - ./.docker/nginx/certs/server.key:/etc/nginx/server.key:ro
     ports:
       - "443:443"
       - "80:80"

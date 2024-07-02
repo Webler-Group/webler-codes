@@ -24,9 +24,9 @@ const generateEmailVerificationCode = async (userId: number, username: string, u
     <p>This code expires in ${codeRecord.expiresInMinutes} minutes.</p>
     <p>With regards,<br>
     <br>
-    Your Weblercodes team</p>`;
+    Your Webler Codes team</p>`;
 
-    await sendMail(userEmail, 'Account verification', emailHtml);
+    await sendMail(userEmail, 'Account Verification', emailHtml);
 }
 
 const validateUser = async (userId: number) => {

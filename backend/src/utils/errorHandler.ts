@@ -4,7 +4,7 @@ import InternalException from "../exceptions/InternalException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
 import { ZodError } from "zod";
 import BadRequestException from "../exceptions/BadRequestException";
-import { logEvents } from "../services/logger";
+import { writeLogFile } from "../services/logger";
 
 export const errorHandler = (method: Function) => {
     return async (req: Request, res: Response, next: NextFunction) => {
@@ -18,7 +18,7 @@ export const errorHandler = (method: Function) => {
                 exception = new BadRequestException('Unprocessable entity', ErrorCode.UNPROCESSABLE_ENTITY, error);
             } else {
                 exception = new InternalException('Something went wrong', ErrorCode.INTERNAL_EXCEPTION, null);
-                logEvents(error.stack, 'error.log');
+                writeLogFile(error.stack);
             }
             next(exception);
         }

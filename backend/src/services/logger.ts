@@ -1,29 +1,25 @@
 import fs from 'fs';
-import { format } from 'date-fns';
 import path from 'path';
 import { NODE_ENV } from '../utils/globals';
+import { generateRandomFileName } from '../utils/fileUtils';
 
-const logEvents = (data: any, logFileName: string) => {
-    try {
-        const dateTime = format(new Date(), 'yyyy/MM/dd HH:mm:ss');
-        const logItem = `${dateTime} ${data}\n`;
-        const dirPath = path.join(__dirname, '../../logs');
+const writeLogFile = (content: any) => {
+    let logFileName = `${generateRandomFileName()}.log`;
+    let dirPath = path.join(__dirname, '../../logs');
 
-        if(NODE_ENV === 'development') {
-            console.log(logItem);
-        }
+    if (!fs.existsSync(dirPath)) {
+        fs.mkdirSync(dirPath);
+    }
 
-        if(!fs.existsSync(dirPath)) {
-            fs.mkdirSync(dirPath);
-        }
+    let logFilePath = path.join(dirPath, logFileName);
 
-        fs.appendFileSync(path.join(dirPath, logFileName), logItem, { encoding: 'utf-8' });
+    fs.writeFileSync(logFilePath, content + '\n', { encoding: 'utf-8' });
 
-    } catch (error) {
-        console.log(error);
+    if (NODE_ENV === 'development') {
+        console.log(`Log file written at ${logFilePath}`);
     }
 }
 
 export {
-    logEvents
+    writeLogFile
 }
