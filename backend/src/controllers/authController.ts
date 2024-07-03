@@ -22,11 +22,11 @@ const register = errorHandler(async (req: Request, res: Response) => {
 
     let user = await dbClient.user.findFirst({ where: { username } });
     if (user) {
-        throw new BadRequestException('Username is already in use', ErrorCode.USER_ALREADY_EXISTS);
+        throw new BadRequestException('Username is already in use', ErrorCode.USERNAME_IS_USED);
     }
     user = await dbClient.user.findFirst({ where: { email } });
     if (user) {
-        throw new BadRequestException('Email is already in use', ErrorCode.USER_ALREADY_EXISTS);
+        throw new BadRequestException('Email is already in use', ErrorCode.EMAIL_IS_USED);
     }
     user = await dbClient.user.create({
         data: {
@@ -39,8 +39,7 @@ const register = errorHandler(async (req: Request, res: Response) => {
     await generateEmailVerificationCode(user.id, username, email);
 
     res.json({
-        user,
-        success: true
+        user
     });
 });
 
@@ -141,12 +140,12 @@ const refreshToken = errorHandler(async (req: Request, res: Response) => {
     const refreshToken = req.cookies?.refreshToken;
 
     if(!refreshToken) {
-        throw new UnauthorizedException('Unauthorized', ErrorCode.UNAUTHORIZED);
+        throw new UnauthorizedException('Refresh token is not set', ErrorCode.UNAUTHORIZED);
     }
 
     jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, async (errors: jwt.VerifyErrors | null, decoded: any) => {
         if(errors) {
-            throw new UnauthorizedException('Unauthorized', ErrorCode.UNAUTHORIZED)
+            throw new UnauthorizedException('Refresh token is invalid', ErrorCode.UNAUTHORIZED)
         }
 
         const user = await validateUser(decoded.userId);
