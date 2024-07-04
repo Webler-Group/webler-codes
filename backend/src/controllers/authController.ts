@@ -16,6 +16,8 @@ import { errorHandler } from "../middleware/errorMiddleware";
 import { Role } from "@prisma/client";
 import { getUserById, getUserByUsername } from "../services/userHelper";
 
+
+
 export const register = errorHandler(async (req: Request, res: Response) => {
 
     registerSchema.parse(req.body);

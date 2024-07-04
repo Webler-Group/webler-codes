@@ -1,9 +1,9 @@
 import express from 'express';
 import { API_PREFIX, BACKEND_PORT } from './utils/globals';
-import authRouter from './routes/authRoute';
+import authRouter from './routes/authRouter';
 import { errorMiddleware } from './middleware/errorMiddleware';
 import cookieParser from 'cookie-parser';
-import userRouter from './routes/userRoute';
+import userRouter from './routes/userRouter';
 import NotFoundException from './exceptions/NotFoundException';
 import { ErrorCode } from './exceptions/enums/ErrorCode';
 
