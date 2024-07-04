@@ -10,7 +10,7 @@ import { sendMail } from "./email";
  * @param username Username
  * @param userEmail Email
  */
-const generateEmailVerificationCode = async (userId: number, username: string, userEmail: string) => {
+export const generateEmailVerificationCode = async (userId: number, username: string, userEmail: string) => {
     const code = ("" + Math.random()).substring(2, 8);
 
     const codeRecord = await dbClient.verficationCode.create({
@@ -33,22 +33,17 @@ const generateEmailVerificationCode = async (userId: number, username: string, u
 }
 
 /**
- * Throws exception if user doesn't exist or isn't verified
+ * Returns user by ID if exists and is verified else throws exception
  * 
  * @param userId User ID
  * @returns User
  */
-const validateUser = async (userId: number) => {
+export const getAuthenticatedUser = async (userId: number) => {
     const user = await dbClient.user.findFirst({ where: { id: userId } });
         
     if(!user || !user.isVerified) {
-        throw new ForbiddenException('Forbidden', ErrorCode.FORBIDDEN);
+        throw new ForbiddenException('User is not authenticated', ErrorCode.FORBIDDEN);
     }
 
     return user;
-}
-
-export {
-    generateEmailVerificationCode,
-    validateUser
 }

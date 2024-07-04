@@ -14,7 +14,7 @@ datasource db {
 }
 
 model User {
-  id               Int            @id @default(autoincrement())
+  id               Int               @id @default(autoincrement())
   username         String            @unique @db.VarChar(64)
   email            String            @unique @db.VarChar(64)
   password         String            @db.VarChar(128)
@@ -32,10 +32,10 @@ model User {
   websiteUrl       String?           @db.VarChar(64)
   roles            Role[]
   verficationCode  VerficationCode[]
-  followedBy       User[]            @relation("UserFollows")
-  following        User[]            @relation("UserFollows")
-  blockedBy        User[]            @relation("UserBlocks")
-  blockedUsers     User[]            @relation("UserBlocks")
+  followers        UserFollows[]     @relation("following")
+  following        UserFollows[]     @relation("follower")
+  blockedBy        UserBlocks[]      @relation("blocking")
+  blocking         UserBlocks[]      @relation("blockedBy")
   IPAddressRecord  IPAddressRecord[]
   SocialAccount    SocialAccount[]
 }
@@ -48,7 +48,7 @@ enum Role {
 }
 
 model VerficationCode {
-  id               Int   @id @default(autoincrement())
+  id               Int      @id @default(autoincrement())
   code             String   @db.Char(6)
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId           Int
@@ -71,4 +71,22 @@ model SocialAccount {
   userId Int
 
   @@id([url, userId])
+}
+
+model UserFollows {
+  follower    User @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  followerId  Int
+  following   User @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+  followingId Int
+
+  @@id([followerId, followingId])
+}
+
+model UserBlocks {
+  blockedBy   User @relation("blockedBy", fields: [blockedById], references: [id], onDelete: Cascade)
+  blockedById Int
+  blocking    User @relation("blocking", fields: [blockingId], references: [id], onDelete: Cascade)
+  blockingId  Int
+
+  @@id([blockedById, blockingId])
 }

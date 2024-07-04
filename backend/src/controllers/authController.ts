@@ -7,14 +7,16 @@ import BadRequestException from "../exceptions/BadRequestException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
 import { loginSchema, registerSchema, resendEmailVerificationCodeSchema, verifyEmailSchema } from "../schemas/authSchemas";
 import NotFoundException from "../exceptions/NotFoundException";
-import { generateEmailVerificationCode, validateUser } from "../services/authHelper";
+import { generateEmailVerificationCode, getAuthenticatedUser } from "../services/authHelper";
 import { AuthRequest } from "../middleware/authMiddleware";
 import { clearRefreshTokenCookie, generateAccessToken, generateRefreshToken, setRefreshTokenCookie } from "../utils/tokenUtils";
 import UnauthorizedException from "../exceptions/UnauthorizedException";
 import ForbiddenException from "../exceptions/ForbiddenException";
 import { errorHandler } from "../middleware/errorMiddleware";
+import { Role } from "@prisma/client";
+import { getUserById, getUserByUsername } from "../services/userHelper";
 
-const register = errorHandler(async (req: Request, res: Response) => {
+export const register = errorHandler(async (req: Request, res: Response) => {
 
     registerSchema.parse(req.body);
 
@@ -32,7 +34,8 @@ const register = errorHandler(async (req: Request, res: Response) => {
         data: {
             username,
             email,
-            password: bcrypt.hashSync(password, 10)
+            password: bcrypt.hashSync(password, 10),
+            roles: [Role.USER]
         }
     });
 
@@ -43,15 +46,12 @@ const register = errorHandler(async (req: Request, res: Response) => {
     });
 });
 
-const login = errorHandler(async (req: Request, res: Response) => {
+export const login = errorHandler(async (req: Request, res: Response) => {
     loginSchema.parse(req.body);
 
     const { username, password } = req.body;
 
-    let user = await dbClient.user.findFirst({ where: { username } });
-    if (!user) {
-        throw new NotFoundException('User not found', ErrorCode.USER_NOT_FOUND);
-    }
+    const user = await getUserByUsername(username);
 
     if(!user.isVerified) {
         throw new ForbiddenException('User is not verified', ErrorCode.FORBIDDEN);
@@ -64,12 +64,19 @@ const login = errorHandler(async (req: Request, res: Response) => {
     const { accessToken, info: accessTokenInfo } = generateAccessToken(user.id);
     const { refreshToken } = generateRefreshToken(user.id);
 
+    await dbClient.user.update({
+        where: { id: user.id },
+        data: {
+            lastTimeLoggedIn: new Date()
+        }
+    });
+
     setRefreshTokenCookie(res, { refreshToken });
 
     res.json({ accessToken, accessTokenInfo });
 });
 
-const logout = errorHandler(async (req: Request, res: Response) => {
+export const logout = errorHandler(async (req: Request, res: Response) => {
     const refreshToken = req.cookies?.refreshToken;
 
     if(refreshToken) {
@@ -79,16 +86,12 @@ const logout = errorHandler(async (req: Request, res: Response) => {
     res.json({});
 });
 
-const resendEmailVerificationCode = errorHandler(async (req: Request, res: Response) => {
+export const resendEmailVerificationCode = errorHandler(async (req: Request, res: Response) => {
     resendEmailVerificationCodeSchema.parse(req.body);
 
     const { userId } = req.body;
 
-    const user = await dbClient.user.findFirst({ where: { id: userId } });
-
-    if (!user) {
-        throw new NotFoundException('User not found', ErrorCode.USER_NOT_FOUND);
-    }
+    const user = await getUserById(userId);
 
     if (user.isVerified) {
         throw new BadRequestException('User is already verified', ErrorCode.USER_ALREADY_VERIFIED);
@@ -101,16 +104,12 @@ const resendEmailVerificationCode = errorHandler(async (req: Request, res: Respo
     });
 });
 
-const verifyEmail = errorHandler(async (req: Request, res: Response) => {
+export const verifyEmail = errorHandler(async (req: Request, res: Response) => {
     verifyEmailSchema.parse(req.body);
 
     const { userId, code } = req.body;
 
-    const user = await dbClient.user.findFirst({ where: { id: userId } });
-
-    if (!user) {
-        throw new NotFoundException('User not found', ErrorCode.USER_NOT_FOUND);
-    }
+    const user = await getUserById(userId);
 
     const verificationCodeRecord = await dbClient.verficationCode.findFirst({ where: { userId, code } });
     if (!verificationCodeRecord) {
@@ -132,11 +131,11 @@ const verifyEmail = errorHandler(async (req: Request, res: Response) => {
     });
 });
 
-const getMe = errorHandler(async (req: AuthRequest, res: Response) => {
+export const getMe = errorHandler(async (req: AuthRequest, res: Response) => {
     res.json(req.user);
 });
 
-const refreshToken = errorHandler(async (req: Request, res: Response) => {
+export const refreshToken = errorHandler(async (req: Request, res: Response) => {
     const refreshToken = req.cookies?.refreshToken;
 
     if(!refreshToken) {
@@ -148,7 +147,7 @@ const refreshToken = errorHandler(async (req: Request, res: Response) => {
             throw new UnauthorizedException('Refresh token is invalid', ErrorCode.UNAUTHORIZED)
         }
 
-        const user = await validateUser(decoded.userId);
+        const user = await getAuthenticatedUser(decoded.userId);
 
         const { accessToken, info: accessTokenInfo } = generateAccessToken(user.id);
         const { refreshToken } = generateRefreshToken(user.id);
@@ -159,13 +158,3 @@ const refreshToken = errorHandler(async (req: Request, res: Response) => {
 
     });
 });
-
-export {
-    register,
-    login,
-    resendEmailVerificationCode,
-    verifyEmail,
-    getMe,
-    logout,
-    refreshToken
-}
