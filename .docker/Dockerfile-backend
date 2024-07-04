@@ -8,6 +8,6 @@ COPY ./backend/prisma /var/www/webler-codes/backend/prisma
 RUN npm install
 RUN npx prisma generate
 
-EXPOSE ${APP_PORT}
+EXPOSE ${BACKEND_PORT}
 
 CMD ["npm", "run", "dev"]

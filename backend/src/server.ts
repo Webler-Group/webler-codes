@@ -1,9 +1,11 @@
 import express from 'express';
-import { API_PREFIX, APP_PORT } from './utils/globals';
+import { API_PREFIX, BACKEND_PORT } from './utils/globals';
 import authRouter from './routes/authRoute';
 import { errorMiddleware } from './middleware/errorMiddleware';
 import cookieParser from 'cookie-parser';
 import userRouter from './routes/userRoute';
+import NotFoundException from './exceptions/NotFoundException';
+import { ErrorCode } from './exceptions/enums/ErrorCode';
 
 const app = express();
 
@@ -13,12 +15,12 @@ app.use(cookieParser());
 app.use(`${API_PREFIX}/auth`, authRouter);
 app.use(`${API_PREFIX}/user`, userRouter);
 
-app.use(errorMiddleware);
-
-app.get('*', (req, res) => {
-    res.status(404).json({ message: 'Not found' });
+app.get('*', (req, res, next) => {
+    next(new NotFoundException('Route does not exist', ErrorCode.ROUTE_NOT_FOUND))
 });
 
-app.listen(APP_PORT, () => {
-    console.log(`App listening on ${APP_PORT}`);
+app.use(errorMiddleware);
+
+app.listen(BACKEND_PORT, () => {
+    console.log(`App listening on ${BACKEND_PORT}`);
 });

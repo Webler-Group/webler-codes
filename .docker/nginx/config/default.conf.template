@@ -1,0 +1,36 @@
+server {
+  listen 80;
+  server_name ${SERVER_NAME};
+  return 301 https://localhost$request_uri;
+}
+
+server {
+  listen 443 ssl;
+  server_name ${SERVER_NAME};
+  root /usr/share/nginx/html;
+
+  ssl_certificate /etc/nginx/server.crt;
+  ssl_certificate_key /etc/nginx/server.key;
+
+  ssl_session_cache  builtin:1000  shared:SSL:10m;
+  ssl_protocols  TLSv1 TLSv1.1 TLSv1.2;
+  ssl_ciphers HIGH:!aNULL:!eNULL:!EXPORT:!CAMELLIA:!DES:!MD5:!PSK:!RC4;
+  ssl_prefer_server_ciphers on;
+
+  location / {
+    root /var/www/webler-codes/frontend/dist;
+    index  index.html index.htm;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    try_files $uri $uri/ /index.html;
+  }
+
+  location /api {
+    proxy_pass http://backend:${BACKEND_PORT};
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_cache_bypass $http_upgrade;
+  }
+}
