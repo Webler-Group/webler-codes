@@ -4,7 +4,7 @@ configDotenv();
 
 export const NODE_ENV = process.env.NODE_ENV;
 
-export const BACKEND_PORT = process.env.BACKEND_PORT as unknown as number || 5500;
+export const BACKEND_PORT = process.env.BACKEND_PORT as unknown as number;
 
 export const EMAIL_HOST = process.env.EMAIL_HOST;
 export const EMAIL_PORT = process.env.EMAIL_PORT as number | undefined;
