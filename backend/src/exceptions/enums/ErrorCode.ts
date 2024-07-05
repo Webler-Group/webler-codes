@@ -15,6 +15,8 @@ export enum ErrorCode {
     FORBIDDEN = 2002,
 
     UNPROCESSABLE_ENTITY = 3001,
+
+    BAD_REQUEST = 4001,
     
     INTERNAL_EXCEPTION = 7001,
 }

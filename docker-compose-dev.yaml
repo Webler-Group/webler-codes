@@ -16,6 +16,8 @@ services:
       - PGADMIN_DEFAULT_EMAIL=admin@weblercodes.com
       - PGADMIN_DEFAULT_PASSWORD=secret
       - PGADMIN_DISABLE_POSTFIX=true
+      - PGADMIN_CONFIG_CONSOLE_LOG_LEVEL=50
+      - GUNICORN_ACCESS_LOGFILE=/dev/null
     volumes:
       - ./.docker/pgadmin/config/servers.json:/pgadmin4/servers.json:ro
     ports:

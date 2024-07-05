@@ -55,12 +55,12 @@ export const login = errorHandler(async (req: Request, res: Response) => {
 
     const user = await getUserByUsername(username);
 
-    if(!user.isVerified) {
-        throw new ForbiddenException('User is not verified', ErrorCode.FORBIDDEN);
-    }
-
     if (!bcrypt.compareSync(password, user.password)) {
         throw new BadRequestException('Password is not correct', ErrorCode.INCORRECT_PASSWORD);
+    }
+
+    if(!user.isVerified) {
+        throw new ForbiddenException('User is not verified', ErrorCode.FORBIDDEN);
     }
     
     const { accessToken, info: accessTokenInfo } = generateAccessToken(user.id);

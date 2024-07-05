@@ -18,3 +18,6 @@ export const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET!;
 export const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
 
 export const LOG_DIR = process.env.LOG_DIR || 'logs';
+
+export const ADMIN_EMAIL = process.env.ADMIN_EMAIL as string;
+export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD as string;
