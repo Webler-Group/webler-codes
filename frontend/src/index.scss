@@ -1,0 +1,9 @@
+$h1-color: blue;
+h1{
+    color: $h1-color;
+}
+/*
+Vite has built-in support for sass, we just needed to add compiler via npm or install it seperately.
+For now i added it via npm.
+to use sass files just import them to tsx files like how you import css files.
+*/
