@@ -11,15 +11,7 @@ const main = async () => {
         password: bcrypt.hashSync(ADMIN_PASSWORD, 10),
         isVerified: true,
         roles: [Role.USER, Role.CREATOR, Role.MODERATOR, Role.ADMIN],
-        level: 25,
-        profile: {
-            connectOrCreate: {
-                where: { userId: 0 },
-                create: {
-                    workplace: 'Webler Codes'
-                }
-            }
-        }
+        level: 25
     };
 
     const admin = await dbClient.user.upsert({
