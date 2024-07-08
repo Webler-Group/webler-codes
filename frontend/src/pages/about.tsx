@@ -1,4 +1,4 @@
-import Metas from '../components/metas.tsx' ;
+import Metas from '../components/metas' ;
 
 const About = () => {
   return (
