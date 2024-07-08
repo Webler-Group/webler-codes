@@ -23,29 +23,29 @@ model User {
   lastTimeLoggedIn DateTime?
   level            Int               @default(1)
   xp               Int               @default(0)
-  failedLoginCount     Int               @default(0)
+  failedLoginCount Int               @default(0)
   roles            Role[]
   verficationCode  VerficationCode[]
+  followers        UserFollows[]     @relation("following")
+  following        UserFollows[]     @relation("follower")
+  blockedBy        UserBlocks[]      @relation("blocking")
+  blocking         UserBlocks[]      @relation("blockedBy")
+  IPAddressRecord  IPAddressRecord[]
   profile          Profile?
 }
 
 model Profile {
-  id              Int               @id @default(autoincrement())
-  fullname        String?           @db.VarChar(64)
-  avatarUrl       String?
-  bio             String            @default("") @db.VarChar(256)
-  location        String?           @db.VarChar(64)
-  workplace       String?           @db.VarChar(64)
-  education       String?           @db.VarChar(64)
-  websiteUrl      String?           @db.VarChar(64)
-  followers       UserFollows[]     @relation("following")
-  following       UserFollows[]     @relation("follower")
-  blockedBy       UserBlocks[]      @relation("blocking")
-  blocking        UserBlocks[]      @relation("blockedBy")
-  IPAddressRecord IPAddressRecord[]
-  SocialAccount   SocialAccount[]
-  user            User              @relation(fields: [userId], references: [id])
-  userId          Int               @unique
+  id            Int             @id @default(autoincrement())
+  fullname      String?         @db.VarChar(64)
+  avatarUrl     String?
+  bio           String          @default("") @db.VarChar(256)
+  location      String?         @db.VarChar(64)
+  workplace     String?         @db.VarChar(64)
+  education     String?         @db.VarChar(64)
+  websiteUrl    String?         @db.VarChar(64)
+  SocialAccount SocialAccount[]
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        Int             @unique
 }
 
 enum Role {
@@ -67,7 +67,7 @@ model VerficationCode {
 model IPAddressRecord {
   ip           String
   lastTimeUsed DateTime?
-  user         Profile   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       Int
 
   @@id([ip, userId])
@@ -82,18 +82,18 @@ model SocialAccount {
 }
 
 model UserFollows {
-  follower    Profile @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  follower    User @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
   followerId  Int
-  following   Profile @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+  following   User @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
   followingId Int
 
   @@id([followerId, followingId])
 }
 
 model UserBlocks {
-  blockedBy   Profile @relation("blockedBy", fields: [blockedById], references: [id], onDelete: Cascade)
+  blockedBy   User @relation("blockedBy", fields: [blockedById], references: [id], onDelete: Cascade)
   blockedById Int
-  blocking    Profile @relation("blocking", fields: [blockingId], references: [id], onDelete: Cascade)
+  blocking    User @relation("blocking", fields: [blockingId], references: [id], onDelete: Cascade)
   blockingId  Int
 
   @@id([blockedById, blockingId])

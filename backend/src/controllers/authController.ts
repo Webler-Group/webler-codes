@@ -7,14 +7,14 @@ import BadRequestException from "../exceptions/BadRequestException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
 import { loginSchema, registerSchema, resendEmailVerificationCodeSchema, verifyEmailSchema } from "../schemas/authSchemas";
 import NotFoundException from "../exceptions/NotFoundException";
-import { generateEmailVerificationCode, getAuthenticatedUser } from "../services/authHelper";
+import { generateEmailVerificationCode, getAuthenticatedUser } from "../helpers/authHelper";
 import { AuthRequest } from "../middleware/authMiddleware";
 import { clearRefreshTokenCookie, generateAccessToken, generateRefreshToken, setRefreshTokenCookie } from "../utils/tokenUtils";
 import UnauthorizedException from "../exceptions/UnauthorizedException";
 import ForbiddenException from "../exceptions/ForbiddenException";
 import { errorHandler } from "../middleware/errorMiddleware";
 import { Role } from "@prisma/client";
-import { getUserById, getUserByUsername } from "../services/userHelper";
+import { findUserOrThrow, getUserInfo } from "../helpers/userHelper";
 
 
 
@@ -44,18 +44,25 @@ export const register = errorHandler(async (req: Request, res: Response) => {
     await generateEmailVerificationCode(user.id, username, email);
 
     res.json({
-        user
+        userInfo: getUserInfo(user)
     });
 });
 
 export const login = errorHandler(async (req: Request, res: Response) => {
     loginSchema.parse(req.body);
 
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
-    const user = await getUserByUsername(username);
+    const user = await findUserOrThrow({ email });
 
     if (!bcrypt.compareSync(password, user.password)) {
+        await dbClient.user.update({
+            where: { id: user.id },
+            data: {
+                failedLoginCount: { increment: 1 }
+            }
+        });
+
         throw new BadRequestException('Password is not correct', ErrorCode.INCORRECT_PASSWORD);
     }
 
@@ -69,13 +76,20 @@ export const login = errorHandler(async (req: Request, res: Response) => {
     await dbClient.user.update({
         where: { id: user.id },
         data: {
-            lastTimeLoggedIn: new Date()
+            lastTimeLoggedIn: new Date(),
+            failedLoginCount: 0,
+            profile: {
+                connectOrCreate: {
+                    where: { userId: user.id },
+                    create: {}
+                }
+            }
         }
     });
 
     setRefreshTokenCookie(res, { refreshToken });
 
-    res.json({ accessToken, accessTokenInfo });
+    res.json({ accessToken, accessTokenInfo, userInfo: getUserInfo(user) });
 });
 
 export const logout = errorHandler(async (req: Request, res: Response) => {
@@ -91,9 +105,9 @@ export const logout = errorHandler(async (req: Request, res: Response) => {
 export const resendEmailVerificationCode = errorHandler(async (req: Request, res: Response) => {
     resendEmailVerificationCodeSchema.parse(req.body);
 
-    const { userId } = req.body;
+    const { email } = req.body;
 
-    const user = await getUserById(userId);
+    const user = await findUserOrThrow({ email });
 
     if (user.isVerified) {
         throw new BadRequestException('User is already verified', ErrorCode.USER_ALREADY_VERIFIED);
@@ -109,11 +123,11 @@ export const resendEmailVerificationCode = errorHandler(async (req: Request, res
 export const verifyEmail = errorHandler(async (req: Request, res: Response) => {
     verifyEmailSchema.parse(req.body);
 
-    const { userId, code } = req.body;
+    const { email, code } = req.body;
 
-    const user = await getUserById(userId);
+    const user = await findUserOrThrow({ email });
 
-    const verificationCodeRecord = await dbClient.verficationCode.findFirst({ where: { userId, code } });
+    const verificationCodeRecord = await dbClient.verficationCode.findFirst({ where: { userId: user.id, code } });
     if (!verificationCodeRecord) {
         throw new NotFoundException('Verification code not found', ErrorCode.VERIFICATION_CODE_NOT_FOUND);
     }
@@ -122,7 +136,7 @@ export const verifyEmail = errorHandler(async (req: Request, res: Response) => {
     }
 
     await dbClient.user.update({
-        where: { id: userId },
+        where: { id: user.id },
         data: { isVerified: true }
     });
 
@@ -134,7 +148,7 @@ export const verifyEmail = errorHandler(async (req: Request, res: Response) => {
 });
 
 export const getMe = errorHandler(async (req: AuthRequest, res: Response) => {
-    res.json(req.user);
+    res.json(getUserInfo(req.user!));
 });
 
 export const refreshToken = errorHandler(async (req: Request, res: Response) => {
@@ -157,6 +171,5 @@ export const refreshToken = errorHandler(async (req: Request, res: Response) => 
         setRefreshTokenCookie(res, { refreshToken });
 
         res.json({ accessToken, accessTokenInfo });
-
     });
 });

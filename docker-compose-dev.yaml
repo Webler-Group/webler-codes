@@ -39,7 +39,6 @@ services:
       - ./backend/src:/var/www/webler-codes/backend/src:ro
       - ./backend/.env:/var/www/webler-codes/backend/.env:ro
       - ./backend/prisma/schema.prisma:/var/www/webler-codes/backend/prisma/schema.prisma:ro
-      - ./backend/prisma/migrations:/var/www/webler-codes/backend/prisma/migrations
   
   nginx:
     container_name: webler-codes-nginx

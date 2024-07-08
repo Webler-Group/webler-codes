@@ -1,7 +1,7 @@
 import ForbiddenException from "../exceptions/ForbiddenException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
-import { dbClient } from "./database";
-import { sendMail } from "./email";
+import { dbClient } from "../services/database";
+import { sendMail } from "../services/email";
 
 /**
  * Creates 6-digit verification code in DB and sends email

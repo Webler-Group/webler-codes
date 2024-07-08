@@ -5,7 +5,7 @@ import * as jwt from "jsonwebtoken";
 import { ACCESS_TOKEN_SECRET } from "../utils/globals";
 import { Role, User } from "@prisma/client";
 import { TokenPayload } from "../utils/tokenUtils";
-import { getAuthenticatedUser } from "../services/authHelper";
+import { getAuthenticatedUser } from "../helpers/authHelper";
 import HttpException from "../exceptions/HttpException";
 import ForbiddenException from "../exceptions/ForbiddenException";
 
