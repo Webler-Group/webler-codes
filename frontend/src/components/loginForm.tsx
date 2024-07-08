@@ -32,7 +32,7 @@ const LoginForm = ({onLogin}: LoginFormProps) => {
 
   return (
     <form name="loginForm" onSubmit={(e) => {handleSubmit(e); return false;}} method="post">
-      <input type="string" name="username" onChange={(e)=>{setUsername(e.target.value)}} required placeholder="email" />
+      <input type="string" name="username" onChange={(e)=>{setUsername(e.target.value)}} required placeholder="username" />
       <input type="password" name="password" onChange={(e)=>{setPassword(e.target.value)}} required placeholder="password" />
       <input type="submit" />
     </form>
