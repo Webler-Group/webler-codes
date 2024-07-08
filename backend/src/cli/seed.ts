@@ -13,8 +13,7 @@ const main = async () => {
             username: 'weblercodes',
             password: bcrypt.hashSync(ADMIN_PASSWORD, 10),
             isVerified: true,
-            roles: [Role.USER, Role.CREATOR, Role.MODERATOR, Role.ADMIN],
-            workplace: "Webler Codes"
+            roles: [Role.USER, Role.CREATOR, Role.MODERATOR, Role.ADMIN]
         },
     });
 
