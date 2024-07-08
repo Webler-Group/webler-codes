@@ -4,12 +4,16 @@ interface RegisterFormProps {
     onRegister: () => void;
 }
 
+interface Event {
+  preventDefault: () => void,
+}
+
 const RegisterForm = ({onRegister}: RegisterFormProps) => {
   const [username, setUsername] = createSignal("");
   const [email, setEmail] = createSignal("");
   const [password, setPassword] = createSignal("");
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: Event) => {
     e.preventDefault();
     const data = {
       username:username(),

@@ -4,11 +4,15 @@ interface LoginFormProps {
     onLogin: () => void;
 }
 
+interface Event {
+  preventDefault: () => void,
+}
+
 const LoginForm = ({onLogin}: LoginFormProps) => {
   const [username, setUsername] = createSignal("");
   const [password, setPassword] = createSignal("");
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: Event) => {
     e.preventDefault();
     const data = {
       password:password(),
