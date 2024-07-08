@@ -1,6 +1,10 @@
 import { MetaProvider, Meta, Title } from "@solidjs/meta";
 
-function Metas(props){
+interface MetasProps{
+  title: string
+}
+
+function Metas(props: MetasProps){
   return (
     <>
       <Title>{props.title}</Title>
