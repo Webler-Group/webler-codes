@@ -23,6 +23,7 @@ model User {
   lastTimeLoggedIn DateTime?
   level            Int               @default(1)
   xp               Int               @default(0)
+  failedLogins     Int               @default(0)
   roles            Role[]
   verficationCode  VerficationCode[]
   profile          Profile?
