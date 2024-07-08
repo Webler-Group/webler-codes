@@ -6,7 +6,7 @@ const dbClient = new PrismaClient();
 
 const main = async () => {
     const admin = await dbClient.user.upsert({
-        where: { email: 'info@weblercodes.com' },
+        where: { email: ADMIN_EMAIL },
         update: {},
         create: {
             email: ADMIN_EMAIL,
