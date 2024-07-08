@@ -1,9 +1,13 @@
 import { createSignal } from "solid-js";
 
+interface Event {
+  preventDefault: () => void,
+}
+
 const VerificationForm = () => {
   const [code, setCode] = createSignal("");
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: Event) => {
     e.preventDefault();
     const userString = sessionStorage.getItem('user');
     if(!userString){
