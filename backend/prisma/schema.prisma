@@ -23,13 +23,7 @@ model User {
   lastTimeLoggedIn DateTime?
   level            Int               @default(1)
   xp               Int               @default(0)
-  fullname         String?           @db.VarChar(64)
-  avatarUrl        String?
-  bio              String            @default("") @db.VarChar(256)
-  location         String?           @db.VarChar(64)
-  workplace        String?           @db.VarChar(64)
-  education        String?           @db.VarChar(64)
-  websiteUrl       String?           @db.VarChar(64)
+  failedLoginCount Int               @default(0)
   roles            Role[]
   verficationCode  VerficationCode[]
   followers        UserFollows[]     @relation("following")
@@ -37,7 +31,21 @@ model User {
   blockedBy        UserBlocks[]      @relation("blocking")
   blocking         UserBlocks[]      @relation("blockedBy")
   IPAddressRecord  IPAddressRecord[]
-  SocialAccount    SocialAccount[]
+  profile          Profile?
+}
+
+model Profile {
+  id            Int             @id @default(autoincrement())
+  fullname      String?         @db.VarChar(64)
+  avatarUrl     String?
+  bio           String          @default("") @db.VarChar(256)
+  location      String?         @db.VarChar(64)
+  workplace     String?         @db.VarChar(64)
+  education     String?         @db.VarChar(64)
+  websiteUrl    String?         @db.VarChar(64)
+  SocialAccount SocialAccount[]
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        Int             @unique
 }
 
 enum Role {
@@ -67,7 +75,7 @@ model IPAddressRecord {
 
 model SocialAccount {
   url    String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int
 
   @@id([url, userId])
