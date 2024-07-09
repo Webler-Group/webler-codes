@@ -8,7 +8,6 @@ const Register = () => {
 
   const register = (errorCode:number, message:string, userId:number) => {
     if(!errorCode){
-      alert("successful registration");
       navigate(`/verification/${userId}`);
     }
     else{
