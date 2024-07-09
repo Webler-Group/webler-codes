@@ -1,7 +1,7 @@
 import { createSignal } from "solid-js";
 
 interface LoginFormProps {
-    onLogin: () => void;
+    onLogin: (errorCode:number, message:string) => void;
 }
 
 interface Event {
@@ -18,16 +18,14 @@ const LoginForm = ({onLogin}: LoginFormProps) => {
       password:password(),
       username:username()
     };
-    alert(JSON.stringify(data));
     const response = await fetch("/api/auth/login",
     {
       method: "POST",
       headers:{'content-type': 'application/json'},
       body: JSON.stringify(data)
     }) ;
-    //await onRegister() ;
     const json = await response.json();
-    alert(JSON.stringify(json)) ;
+    await onLogin(json.errorCode, json.message) ;
   }
 
   return (
