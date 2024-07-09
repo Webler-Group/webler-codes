@@ -1,9 +1,20 @@
 import Metas from '../components/metas' ;
 import RegisterForm from '../components/registerForm' ;
+import { useNavigate } from '@solidjs/router' ;
 
 const Register = () => {
 
-  const register = () => {}
+  const navigate = useNavigate();
+
+  const register = (errorCode:number, message:string, userId:number) => {
+    if(!errorCode){
+      alert("successful registration");
+      navigate(`/verification/${userId}`);
+    }
+    else{
+      alert(message + ", errorCode: " + errorCode);
+    }
+  }
 
   return (
     <>

@@ -1,24 +1,29 @@
 import { createSignal } from "solid-js";
+import { useParams } from "@solidjs/router";
 
 interface Event {
   preventDefault: () => void,
 }
 
-const VerificationForm = () => {
+interface VerificationFormProps {
+  onVerification: (errorCode:number, message:string) => void,
+}
+
+const VerificationForm = ({onVerification}: VerificationFormProps) => {
   const [code, setCode] = createSignal("");
+
+  const params = useParams();
+  const userId = params.id ;
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
-    const userString = sessionStorage.getItem('user');
-    if(!userString){
+    if(!userId){
       return ;
     }
-    const user = JSON.parse(userString);
     const data = {
-      userId: user.id,
+      userId: userId,
       code:code(),
     };
-    alert(JSON.stringify(data));
     const response = await fetch("/api/auth/verifyEmail",
     {
       method: "POST",
@@ -26,7 +31,7 @@ const VerificationForm = () => {
       body: JSON.stringify(data)
     }) ;
     const json = await response.json();
-    alert(JSON.stringify(json)) ;
+    onVerification(json.errorCode, json.message) ;
   }
 
   return (

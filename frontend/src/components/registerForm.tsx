@@ -1,7 +1,7 @@
 import { createSignal } from "solid-js";
 
 interface RegisterFormProps {
-    onRegister: () => void;
+    onRegister: (errorCode:number, message:string, userId:number) => void;
 }
 
 interface Event {
@@ -20,18 +20,14 @@ const RegisterForm = ({onRegister}: RegisterFormProps) => {
       password:password(),
       email:email()
     };
-    alert(JSON.stringify(data)) ;
     const response = await fetch("/api/auth/register",
     {
       method: "POST",
       headers:{'content-type': 'application/json'},
       body: JSON.stringify(data)
     }) ;
-    //await onRegister() ;
     const json = await response.json();
-    window.sessionStorage.setItem("user", JSON.stringify(json.user));
-    alert(JSON.stringify(json)) ;
-    alert(JSON.stringify(sessionStorage.getItem("user"))) ;
+    await onRegister(json.errorCode, json.message, (json.user?json.user.id:null)) ;
   }
 
   return (
@@ -43,6 +39,5 @@ const RegisterForm = ({onRegister}: RegisterFormProps) => {
     </form>
   ) ;
 }
-
 
 export default RegisterForm ;
