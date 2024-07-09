@@ -9,7 +9,6 @@ const Verification = () => {
   const verification = (errorCode:number, message:string) => {
     if(errorCode){
       alert(message + ", error: " + errorCode);
-      navigate("/about");
     }else{
       navigate("/about");
     }
