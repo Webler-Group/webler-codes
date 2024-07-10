@@ -12,6 +12,21 @@ interface VerificationFormProps {
 const VerificationForm = ({onVerification, email}: VerificationFormProps) => {
   const [code, setCode] = createSignal("");
 
+  const sendNewCode = async () => {
+    if(!email){
+      return ;
+    }
+    const data = {
+      email:email,
+    };
+    const response = await fetch("/api/auth/resendEmailVerificationCode",
+    {
+      method: "POST",
+      headers:{'content-type': 'application/json'},
+      body: JSON.stringify(data)
+    }) ;
+  }
+
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
     if(!email){
@@ -32,10 +47,13 @@ const VerificationForm = ({onVerification, email}: VerificationFormProps) => {
   }
 
   return (
-    <form name="verificationForm" onSubmit={(e) => {handleSubmit(e); return false;}} method="post">
-      <input type="string" name="code" onChange={(e)=>{setCode(e.target.value)}} required placeholder="code" />
-      <input type="submit" />
-    </form>
+    <>
+      <form name="verificationForm" onSubmit={(e) => {handleSubmit(e); return false;}} method="post">
+        <input type="string" name="code" onChange={(e)=>{setCode(e.target.value)}} required placeholder="code" />
+        <input type="submit" />
+      </form>
+      <button onClick={sendNewCode} >Send New Verification Code</button>
+    </>
   ) ;
 }
 

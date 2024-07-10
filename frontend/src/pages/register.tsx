@@ -1,7 +1,7 @@
 import Metas from '../components/metas' ;
 import RegisterForm from '../components/registerForm' ;
 import VerificationForm from '../components/verificationForm' ;
-import { useNavigate } from '@solidjs/router' ;
+import { useNavigate, A } from '@solidjs/router' ;
 import { Show , createSignal } from "solid-js"
 
 const Register = () => {
@@ -33,7 +33,7 @@ const Register = () => {
       <Metas title="Webler Codes - Register" />
       <h1>Register</h1>
       <RegisterForm onRegister={register} />
-      <a href="/login">Login</a>
+      <A href="/login">Login</A>
       <Show when={showVerification()}>
         <VerificationForm onVerification={verification} email={email()} />
       </Show>
