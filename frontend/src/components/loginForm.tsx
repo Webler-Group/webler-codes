@@ -1,7 +1,7 @@
 import { createSignal } from "solid-js";
 
 interface LoginFormProps {
-    onLogin: (errorCode:number, message:string) => void;
+    onLogin: (errorCode:number, message:string, email:string) => void;
 }
 
 interface Event {
@@ -34,7 +34,7 @@ const LoginForm = ({onLogin}: LoginFormProps) => {
     if(json.userInfo){
       window.sessionStorage.setItem("userInfo", JSON.stringify(json.userInfo));
     }
-    await onLogin(json.errorCode, json.message) ;
+    await onLogin(json.errorCode, json.message, data.email) ;
   }
 
   return (

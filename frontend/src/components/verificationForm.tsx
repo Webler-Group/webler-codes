@@ -5,18 +5,16 @@ interface Event {
 }
 
 interface VerificationFormProps {
-  onVerification: (errorCode:number, message:string) => void,
+  onVerification: (errorCode:number, message:string) => void;
+  email: string;
 }
 
-const VerificationForm = ({onVerification}: VerificationFormProps) => {
+const VerificationForm = ({onVerification, email}: VerificationFormProps) => {
   const [code, setCode] = createSignal("");
-
-  const userInfo = window.sessionStorage.getItem("userInfo");
-  const email = userInfo? JSON.parse(userInfo).email : "" ;
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
-    if(!userInfo){
+    if(!email){
       return ;
     }
     const data = {
@@ -30,7 +28,6 @@ const VerificationForm = ({onVerification}: VerificationFormProps) => {
       body: JSON.stringify(data)
     }) ;
     const json = await response.json();
-    alert(JSON.stringify(json))
     onVerification(json.errorCode, json.message) ;
   }
 
