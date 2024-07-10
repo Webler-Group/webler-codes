@@ -36,8 +36,10 @@ const Login = () => {
     <>
       <Metas title="Webler Codes - Login" />
       <h1>Login</h1>
-      <LoginForm onLogin={login}/>
-      <A href="/register">Register</A>
+      <Show when={!showVerification()}>
+        <LoginForm onLogin={login}/>
+        <A href="/register">Register</A>
+      </Show>
       <Show when={showVerification()}>
         <VerificationForm onVerification={verification} email={email()} />
       </Show>
