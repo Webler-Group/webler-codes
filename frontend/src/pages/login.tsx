@@ -9,6 +9,9 @@ const Login = () => {
   const login = (errorCode:number, message:string) => {
     if(errorCode){
       alert(message + ", error: " + errorCode);
+      if(errorCode == 2002){
+        alert('is your account verified?');
+      }
     }else{
       navigate("/about");
     }

@@ -6,9 +6,9 @@ const Register = () => {
 
   const navigate = useNavigate();
 
-  const register = (errorCode:number, message:string, userId:number) => {
+  const register = (errorCode:number, message:string) => {
     if(!errorCode){
-      navigate(`/verification/${userId}`);
+      navigate(`/verification`);
     }
     else{
       alert(message + ", errorCode: " + errorCode);

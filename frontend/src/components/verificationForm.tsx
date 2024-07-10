@@ -1,5 +1,4 @@
 import { createSignal } from "solid-js";
-import { useParams } from "@solidjs/router";
 
 interface Event {
   preventDefault: () => void,
@@ -12,16 +11,16 @@ interface VerificationFormProps {
 const VerificationForm = ({onVerification}: VerificationFormProps) => {
   const [code, setCode] = createSignal("");
 
-  const params = useParams();
-  const userId = params.id ;
+  const userInfo = window.sessionStorage.getItem("userInfo");
+  const email = userInfo? JSON.parse(userInfo).email : "" ;
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
-    if(!userId){
+    if(!userInfo){
       return ;
     }
     const data = {
-      userId: userId,
+      email:email,
       code:code(),
     };
     const response = await fetch("/api/auth/verifyEmail",
@@ -31,6 +30,7 @@ const VerificationForm = ({onVerification}: VerificationFormProps) => {
       body: JSON.stringify(data)
     }) ;
     const json = await response.json();
+    alert(JSON.stringify(json))
     onVerification(json.errorCode, json.message) ;
   }
 

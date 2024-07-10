@@ -18,7 +18,7 @@ const App = () => (
       <Route path="/" component={Home} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
-      <Route path="/verification/:id" component={Verification} />
+      <Route path="/verification" component={Verification} />
     </Router>
     <Footer />
   </MetaProvider>
