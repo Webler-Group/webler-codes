@@ -48,6 +48,7 @@ const VerificationForm = ({onVerification, email}: VerificationFormProps) => {
 
   return (
     <>
+      <p>Please kindly check your email and submit the verification code below.</p>
       <form name="verificationForm" onSubmit={(e) => {handleSubmit(e); return false;}} method="post">
         <input type="string" name="code" onChange={(e)=>{setCode(e.target.value)}} required placeholder="code" />
         <input type="submit" />
