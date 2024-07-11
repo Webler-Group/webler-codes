@@ -1,28 +1,24 @@
 import Metas from '../components/metas' ;
-import LoginForm from '../components/loginForm' ;
+import RegisterForm from '../components/registerForm' ;
 import VerificationForm from '../components/verificationForm' ;
 import { useNavigate, A } from '@solidjs/router' ;
 import { Show , createSignal } from "solid-js"
 
-const Login = () => {
+const Register = () => {
 
   const [showVerification, setShowVerification] = createSignal(false) ;
   const [email, setEmail] = createSignal("") ;
-
   const navigate = useNavigate();
 
-  const login = (errorCode:number, message:string, emailStr:string) => {
-    if(errorCode){
-      alert(message + ", error: " + errorCode);
-      if(errorCode == 2002){
-        alert('is your account verified?');
-        setEmail(emailStr);
-        setShowVerification(true);
-      }
-    }else{
-      navigate("/about");
+  const register = (errorCode:number, message:string, emailStr:string) => {
+    if(!errorCode){
+      setEmail(emailStr);
+      setShowVerification(true);
     }
-  };
+    else{
+      alert(message + ", errorCode: " + errorCode);
+    }
+  }
 
   const verification = (errorCode:number, message:string) => {
     if(errorCode){
@@ -34,11 +30,11 @@ const Login = () => {
 
   return (
     <>
-      <Metas title="Webler Codes - Login" />
-      <h1>Login</h1>
+      <Metas title="Webler Codes - Register" />
+      <h1>Register</h1>
       <Show when={!showVerification()}>
-        <LoginForm onLogin={login}/>
-        <A href="/register">Register</A>
+        <RegisterForm onRegister={register} />
+        <A href="/login">Login</A>
       </Show>
       <Show when={showVerification()}>
         <VerificationForm onVerification={verification} email={email()} />
@@ -47,4 +43,4 @@ const Login = () => {
   )
 }
 
-export default Login ;
+export default Register ;
