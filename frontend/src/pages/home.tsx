@@ -1,4 +1,4 @@
-import Metas from '../components/metas.tsx' ;
+import Metas from '../components/metas.tsx'
 
 const Home = () => {
   return (
@@ -9,4 +9,4 @@ const Home = () => {
   )
 }
 
-export default Home ;
+export default Home
