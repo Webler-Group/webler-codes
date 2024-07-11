@@ -10,7 +10,7 @@ import { sendMail } from "../services/email";
  * @param username Username
  * @param userEmail Email
  */
-export const generateEmailVerificationCode = async (userId: number, username: string, userEmail: string) => {
+export const generateEmailVerificationCode = async (userId: bigint, username: string, userEmail: string) => {
     const code = ("" + Math.random()).substring(2, 8);
 
     const codeRecord = await dbClient.verficationCode.create({
@@ -38,7 +38,7 @@ export const generateEmailVerificationCode = async (userId: number, username: st
  * @param userId User ID
  * @returns User
  */
-export const getAuthenticatedUser = async (userId: number) => {
+export const getAuthenticatedUser = async (userId: bigint) => {
     const user = await dbClient.user.findFirst({ where: { id: userId } });
         
     if(!user || !user.isVerified) {

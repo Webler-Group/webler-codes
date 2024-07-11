@@ -1,25 +1,22 @@
 import { z } from 'zod';
-
-const username = z.string().min(3).max(20);
-const password = z.string().min(6);
-const email = z.string().email();
+import { emailSchema, passwordSchema, usernameSchema } from './typeSchemas';
 
 export const registerSchema = z.object({
-    username,
-    email: email.regex(/.*(?<!weblercodes.com)$/i),
-    password 
+    username: usernameSchema,
+    email: emailSchema.regex(/.*(?<!weblercodes.com)$/i),
+    password: passwordSchema
 });
 
 export const loginSchema = z.object({
-    email,
-    password
+    email: emailSchema,
+    password: passwordSchema
 });
 
 export const resendEmailVerificationCodeSchema = z.object({
-    email
+    email: emailSchema
 });
 
 export const verifyEmailSchema = z.object({
-    email,
+    email: emailSchema,
     code: z.string().length(6)
 });

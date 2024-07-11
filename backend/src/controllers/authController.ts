@@ -163,7 +163,7 @@ export const refreshToken = errorHandler(async (req: Request, res: Response) => 
             throw new UnauthorizedException('Refresh token is invalid', ErrorCode.UNAUTHORIZED)
         }
 
-        const user = await getAuthenticatedUser(decoded.userId);
+        const user = await getAuthenticatedUser(BigInt(decoded.userId));
 
         const { accessToken, info: accessTokenInfo } = generateAccessToken(user.id);
         const { refreshToken } = generateRefreshToken(user.id);

@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { errorHandler } from "../middleware/errorMiddleware";
 import { AuthRequest } from "../middleware/authMiddleware";
-import { followSchema } from "../schemas/userSchema";
+import { followSchema } from "../schemas/userSchemas";
 import { dbClient } from "../services/database";
 import { findUserOrThrow } from "../helpers/userHelper";
 import BadRequestException from "../exceptions/BadRequestException";
@@ -18,7 +18,7 @@ export const follow = errorHandler(async (req: AuthRequest, res: Response) => {
         throw new BadRequestException('Bad request', ErrorCode.BAD_REQUEST);
     }
 
-    const user = await findUserOrThrow({ id: userId }, { followers: { where: { followerId: loggedUser.id } } });
+    const user = await findUserOrThrow({ id: BigInt(userId) }, { followers: { where: { followerId: loggedUser.id } } });
 
     if(isFollow && user.followers.length == 0) {
         await dbClient.user.update({

@@ -13,7 +13,7 @@ export const findUserOrThrow = async (where: Prisma.UserWhereInput, include: Pri
 
 export const getUserInfo = (user: User) => {
     return {
-        id: user.id,
+        id: user.id.toString(),
         username: user.username,
         email: user.email,
         level: user.level,
