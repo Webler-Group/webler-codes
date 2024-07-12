@@ -113,7 +113,7 @@ model Report {
   children       Report[]     @relation("reportRelates")
   author         User         @relation("authoredReports", fields: [authorId], references: [id])
   authorId       BigInt
-  reportedUser   User?        @relation("reported", fields: [reportedUserId], references: [id])
+  reportedUser   User        @relation("reported", fields: [reportedUserId], references: [id])
   reportedUserId BigInt
   type           ReportType
   status         ReportStatus
@@ -130,7 +130,7 @@ enum ReportStatus {
 }
 
 enum ReportType {
-  USER
+  PROFILE
   CODE
   POST
 }
