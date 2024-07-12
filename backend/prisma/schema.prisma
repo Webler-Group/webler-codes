@@ -32,6 +32,11 @@ model User {
   blocking         UserBlocks[]      @relation("blockedBy")
   IPAddressRecord  IPAddressRecord[]
   profile          Profile?
+  authoredReports  Report[]          @relation("authoredReports")
+  reports          Report[]          @relation("reported")
+  assignedReports  Report[]          @relation("assignedReports")
+  bans             Ban[]             @relation("banned")
+  authoredBans     Ban[]             @relation("authoredBans")
 }
 
 model Profile {
@@ -97,4 +102,56 @@ model UserBlocks {
   blockingId  BigInt
 
   @@id([blockedById, blockingId])
+}
+
+model Report {
+  id             BigInt       @id @default(autoincrement())
+  createdAt      DateTime     @default(now())
+  message        String?      @db.VarChar(256)
+  parent         Report?      @relation("reportRelates", fields: [parentId], references: [id])
+  parentId       BigInt?
+  children       Report[]     @relation("reportRelates")
+  author         User         @relation("authoredReports", fields: [authorId], references: [id])
+  authorId       BigInt
+  reportedUser   User?        @relation("reported", fields: [reportedUserId], references: [id])
+  reportedUserId BigInt
+  type           ReportType
+  status         ReportStatus
+  reason         ReportReason
+  assignee       User?        @relation("assignedReports", fields: [assigneeId], references: [id])
+  assigneeId     BigInt?
+  ban            Ban?         @relation(fields: [banId], references: [id])
+  banId          BigInt?      @unique
+}
+
+enum ReportStatus {
+  OPENED
+  CLOSED
+}
+
+enum ReportType {
+  USER
+  CODE
+  POST
+}
+
+enum ReportReason {
+  INAPPROPRIATE_CONTENT
+  SPAM
+  HARASSMENT
+  HATE_SPEECH
+  MISINFORMATION
+  OTHER
+}
+
+model Ban {
+  id            BigInt       @id @default(autoincrement())
+  reason        ReportReason
+  banStart      DateTime     @default(now())
+  banEnd        DateTime
+  user          User         @relation("banned", fields: [userId], references: [id])
+  userId        BigInt
+  author        User         @relation("authoredBans", fields: [authorId], references: [id])
+  authorId      BigInt
+  relatedReport Report?
 }
