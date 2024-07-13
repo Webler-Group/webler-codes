@@ -35,8 +35,11 @@ services:
     env_file:
       - ./backend/.env
     volumes:
-      - ./backend:/var/www/webler-codes/backend
-      - /var/www/webler-codes/backend/node_modules/
+      - ./backend/src:/var/www/webler-codes/backend/src:ro
+      - ./backend/prisma:/var/www/webler-codes/backend/prisma:ro
+      - ./backend/package.json:/var/www/webler-codes/backend/package.json:ro
+      - ./backend/tsconfig.json:/var/www/webler-codes/backend/tsconfig.json:ro
+      - ./backend/.env:/var/www/webler-codes/backend/.env:ro
   
   nginx:
     container_name: webler-codes-nginx
