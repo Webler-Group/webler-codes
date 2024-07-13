@@ -8,7 +8,7 @@ import { generateRandomFileName } from '../utils/fileUtils';
  * 
  * @param content Log file content
  */
-const writeLogFile = (content: any) => {
+const writeLogFile = (content: any): void => {
     let logFileName = `${generateRandomFileName()}.log`;
     let dirPath = path.join(__dirname, '../..', LOG_DIR);
 

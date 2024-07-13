@@ -20,7 +20,7 @@ const mailTransport = nodemailer.createTransport({
  * @param subject Email subject
  * @param html Email content in HTML format
  */
-const sendMail = async (to: string[] | string, subject: string, html: string) => {
+const sendMail = async (to: string[] | string, subject: string, html: string): Promise<void> => {
     const mailOptions = {
         from: `Webler Codes Team <${EMAIL_USER}>`,
         to,
