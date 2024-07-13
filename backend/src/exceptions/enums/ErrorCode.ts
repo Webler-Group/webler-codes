@@ -1,4 +1,4 @@
-export enum ErrorCode {
+export const enum ErrorCode {
     USER_ALREADY_EXISTS = 1001,
     USER_NOT_FOUND = 1002,
     INCORRECT_PASSWORD = 1003,
