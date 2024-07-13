@@ -1,1 +1,0 @@
-tejadon following wiki

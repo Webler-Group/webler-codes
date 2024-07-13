@@ -4,6 +4,3 @@ DockerFile
 
 # vscode project-specific configuration files
 .vscode
-
-# Local development environment file
-/backend/.env
