@@ -37,6 +37,7 @@ model User {
   assignedReports  Report[]          @relation("assignedReports")
   bans             Ban[]             @relation("banned")
   authoredBans     Ban[]             @relation("authoredBans")
+  codes            Code[]
 }
 
 model Profile {
@@ -156,4 +157,50 @@ model Ban {
   authorId      BigInt
   relatedReport Report?
   note String?
+}
+
+
+
+
+model Code {
+  id               BigInt            @id @default(autoincrement())
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime?         @updatedAt
+  isPublic         Boolean           @default(false)
+  source           String            @db.VarChar
+  title            String            @db.VarChar(64)
+  codeLanguage     CodeLanguage
+  codeVersions     CodeVersion[]
+  tags             Tag[]          
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId           BigInt
+}
+
+enum CodeLanguage {
+  HTML
+  CSS
+  JS
+  C
+  LISP
+}
+
+model CodeVersion {
+  id               BigInt            @id @default(autoincrement())
+  createdAt        DateTime          @default(now())
+  name             String            @db.VarChar(64)
+  source           String
+  code             Code              @relation(fields:[codeId],references:[id], onDelete: Cascade)
+  codeId           BigInt
+}
+
+model CodeTemplate {
+  id               BigInt            @id @default (autoincrement())
+  language         CodeLanguage      @unique
+  source           String
+}
+
+model Tag {
+  id               BigInt            @id @default(autoincrement())
+  name             String            @db.VarChar(64)
+  codes            Code[]
 }
