@@ -1,4 +1,5 @@
 export enum ErrorCode {
+    
     USER_ALREADY_EXISTS = 1001,
     USER_NOT_FOUND = 1002,
     INCORRECT_PASSWORD = 1003,
@@ -10,7 +11,7 @@ export enum ErrorCode {
     VERIFICATION_CODE_EXPIRED = 1012,
 
     PROFILE_NOT_FOUND = 1021,
-
+    REPORT_NOT_FOUND = 1030,
     ROUTE_NOT_FOUND = 1101,
 
     UNAUTHORIZED = 2001,
