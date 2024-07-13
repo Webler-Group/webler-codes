@@ -165,9 +165,9 @@ model Ban {
 model Code {
   id               BigInt            @id @default(autoincrement())
   createdAt        DateTime          @default(now())
-  updatedAt        DateTime?
+  updatedAt        DateTime?         @updatedAt
   isPublic         Boolean           @default(false)
-  source           String            @db.VarChar(8192)
+  source           String            @db.VarChar
   title            String            @db.VarChar(64)
   codeLanguage     CodeLanguage
   codeVersions     CodeVersion[]
@@ -188,15 +188,15 @@ model CodeVersion {
   id               BigInt            @id @default(autoincrement())
   createdAt        DateTime          @default(now())
   name             String            @db.VarChar(64)
-  source           String            @db.VarChar
+  source           String
   code             Code              @relation(fields:[codeId],references:[id], onDelete: Cascade)
-  codeId           BigInt            @unique
+  codeId           BigInt
 }
 
 model CodeTemplate {
   id               BigInt            @id @default (autoincrement())
   language         CodeLanguage      @unique
-  source           String            @db.VarChar
+  source           String
 }
 
 model Tag {
