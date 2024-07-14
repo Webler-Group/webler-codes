@@ -2,15 +2,15 @@ import { configDotenv } from 'dotenv';
 
 configDotenv();
 
-export const NODE_ENV = process.env.NODE_ENV;
+export const NODE_ENV = process.env.NODE_ENV as string;
 
 export const BACKEND_PORT = process.env.BACKEND_PORT as unknown as number;
 
-export const EMAIL_HOST = process.env.EMAIL_HOST;
-export const EMAIL_PORT = process.env.EMAIL_PORT as number | undefined;
+export const EMAIL_HOST = process.env.EMAIL_HOST as string;
+export const EMAIL_PORT = process.env.EMAIL_PORT as unknown as number;
 export const EMAIL_SECURE = process.env.EMAIL_SECURE === "true";
-export const EMAIL_USER = process.env.EMAIL_USER;
-export const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;
+export const EMAIL_USER = process.env.EMAIL_USER as string;
+export const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD as string;
 
 export const API_PREFIX = '/api';
 

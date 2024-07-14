@@ -38,7 +38,6 @@ services:
       - ./backend/src:/var/www/webler-codes/backend/src:ro
       - ./backend/prisma:/var/www/webler-codes/backend/prisma:ro
       - ./backend/package.json:/var/www/webler-codes/backend/package.json:ro
-      - ./backend/tsconfig.json:/var/www/webler-codes/backend/tsconfig.json:ro
       - ./backend/.env:/var/www/webler-codes/backend/.env:ro
   
   nginx:
