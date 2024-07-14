@@ -1,11 +1,12 @@
 import { errorHandler } from "../middleware/errorMiddleware";
 import { Request, Response } from "express";
 import { dbClient } from "../services/database";
-import { ReportReason, ReportStatus, ReportType } from "@prisma/client";
+import { Prisma, ReportReason, ReportStatus, ReportType} from "@prisma/client";
 import { AuthRequest } from "../middleware/authMiddleware";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
 import NotFoundException from "../exceptions/NotFoundException";
 import { reportUserSchema, getReportSchema, banUserSchema, setParentSchema, closeReportSchema } from "../schemas/reportSchemas";
+import { canAbanB } from "../helpers/userHelper";
 
 function calcDate(durationInDays: number){
     return new Date(Date.now()+(86400_000*durationInDays));
@@ -74,6 +75,19 @@ export const closeReport = errorHandler(async (req: AuthRequest, res: Response)=
     const reportId = req.body.reportId as number;
     const note = req.body.reason as string|undefined;
     const bans = req.body.bans as {userId:bigint, reason:ReportReason, durationInDays:number, note:string}[];
+    // DON'T resort this function carelessly.
+    await dbClient.ban.createMany({
+        data:{
+            ...bans.map(ban=>({
+                banEnd: calcDate(ban.durationInDays),
+                reason: ban.reason,
+                note: ban.note,
+                userId: ban.userId,
+                authorId: req.user?.id as bigint,
+            })).filter(async ban=> await canAbanB(ban.authorId,ban.userId))
+        }
+    });
+    
     await dbClient.report.update({
         where:{
             id:reportId,    
@@ -91,18 +105,6 @@ export const closeReport = errorHandler(async (req: AuthRequest, res: Response)=
             }
         }
     })
-    await dbClient.ban.createMany({
-        
-        data:{
-            ...bans.map(ban=>({
-                banEnd: calcDate(ban.durationInDays),
-                reason: ban.reason,
-                note: ban.note,
-                userId: ban.userId,
-                authorId: req.user?.id as bigint,
-            }))
-        }
-    });
     res.json({success:true})
 });
     
