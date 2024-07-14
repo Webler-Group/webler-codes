@@ -19,12 +19,12 @@ export const reportUser = errorHandler(async (req: AuthRequest, res: Response)=>
     const reportType = req.body.type as ReportType;
     const reportReason = req.body.reason as ReportReason;
     const message = req.body.message as string | undefined;
-    const reportedUserId = req.body.reportedUserId as bigint;
+    const reportedUserId = BigInt(req.body.reportedUserId);
 
     await dbClient.report.create({
         data:{
             //user.id actually alaways exist in an AuthRequest after AuthMiddleware got executed
-            authorId:req.user?.id as bigint,
+            authorId:req.user!.id,
             status:ReportStatus.OPENED,
             type:reportType,
             message,
@@ -40,7 +40,7 @@ export const getReport = errorHandler(async (req: AuthRequest, res: Response)=>
 {
     getReportSchema.parse(req.body);
 
-    const reportId = req.body.reportId as bigint;
+    const reportId = BigInt(req.body.reportId) as bigint;
 
     const report = await dbClient.report.findUnique({
         where:{
@@ -48,7 +48,8 @@ export const getReport = errorHandler(async (req: AuthRequest, res: Response)=>
         }
     })
     if(report===null) throw new NotFoundException("There is no error with id: "+reportId,ErrorCode.REPORT_NOT_FOUND);
-    res.json({success:true, report})
+    
+    res.json({success:true})
 });
 
 export const banUser = errorHandler(async (req: AuthRequest, res: Response)=>
@@ -56,14 +57,14 @@ export const banUser = errorHandler(async (req: AuthRequest, res: Response)=>
     banUserSchema.parse(req.body);
     const durationInDays = req.body.durationInDays as number;
     const reason = req.body.reason as ReportReason;
-    const userId = req.body.userId as bigint;
+    const userId = BigInt(req.body.userId);
     const endDate = calcDate(durationInDays);
     await dbClient.ban.create({
         data:{
             banEnd:endDate,
             reason,
             userId,
-            authorId:req.user?.id as bigint
+            authorId:req.user!.id
         }
     });
     res.json({success:true})
@@ -111,8 +112,8 @@ export const closeReport = errorHandler(async (req: AuthRequest, res: Response)=
 export const setParent = errorHandler(async (req: AuthRequest, res: Response)=>
 {
     setParentSchema.parse(req.body);
-    const reportIds = req.body.reportIds as bigint[];
-    const parentId = req.body.parentId as bigint;
+    const reportIds = (req.body.reportIds as string[]).map(x => BigInt(x));
+    const parentId = BigInt(req.body.parentId);
     dbClient.report.updateMany({
         where:{
             id:{in:reportIds}
