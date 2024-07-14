@@ -200,7 +200,6 @@ model CodeTemplate {
 }
 
 model Tag {
-  id               BigInt            @id @default(autoincrement())
-  name             String            @db.VarChar(64)
+  name             String            @id @db.VarChar(64)
   codes            Code[]
 }
