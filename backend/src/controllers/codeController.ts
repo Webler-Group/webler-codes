@@ -78,6 +78,33 @@ export const updateCode = errorHandler(async (req: AuthRequest, res: Response) =
 });
 
 export const getCode = errorHandler(async (req: AuthRequest, res: Response) => {
-
+    getCodeSchema.parse(req.body);
+    const codeId: bigint = req.body.codeId ;
+    if(!req.user){
+        throw "Not authorized";
+    }
+    const queryData = {
+        where: {
+           id: codeId
+        }
+    };
+    try{
+        const code: Code | null = await dbClient.code.findUnique(queryData);
+        if(code){
+          if(code!.isPublic || (req.user!.id == code!.userId)){
+              res.json({
+                  title: code!.title,
+                  source: code!.source,
+                  language: code!.codeLanguage,
+              });
+          }else{
+            throw "code is not public" ;
+          }
+        }else{
+            throw "code not found";
+        }
+    }catch(e){
+        throw e;
+    }
 });
 
