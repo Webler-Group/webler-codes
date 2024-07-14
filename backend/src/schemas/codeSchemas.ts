@@ -10,6 +10,16 @@ export const deleteCodeSchema = z.object({
     codeId: idSchema,
 });
 
+export const getCodeSchema = z.object({
+    codeId: idSchema,
+});
+
+export const updateCodeSchema = z.object({
+    codeId: idSchema,
+    title: z.string(),
+    source: z.string(),
+});
+
 export const createCodeSchema = z.object({
     language: z.nativeEnum(CodeLanguage),
     title: z.string(),

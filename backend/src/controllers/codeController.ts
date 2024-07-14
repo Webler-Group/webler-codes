@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { dbClient } from "../services/database";
-import { getTemplateSchema , createCodeSchema , deleteCodeSchema} from "../schemas/codeSchemas";
+import { getTemplateSchema , createCodeSchema , deleteCodeSchema , updateCodeSchema , getCodeSchema } from "../schemas/codeSchemas";
 import { AuthRequest } from "../middleware/authMiddleware";
 import { errorHandler } from "../middleware/errorMiddleware";
 import { CodeLanguage , Code , User } from "@prisma/client";
@@ -50,3 +50,34 @@ export const deleteCode = errorHandler(async (req: AuthRequest, res: Response) =
         throw "Delete failed";
     }
 });
+
+export const updateCode = errorHandler(async (req: AuthRequest, res: Response) => {
+    updateCodeSchema.parse(req.body);
+    const codeId: bigint = req.body.codeId ;
+    const title: string = req.body.title ;
+    const source: string = req.body.source ;
+    if(!req.user){
+        throw "Not authorized";
+    }
+    const queryData = {
+        where:{
+            id: codeId,
+            userId:req.user!.id
+        },
+        data: {
+            title,
+            source,
+        }
+    }
+    try{
+        const code: Code = await dbClient.code.update(queryData);
+        res.json({ success: !!code.id });
+    }catch(e){
+        throw "Could not update code";
+    }
+});
+
+export const getCode = errorHandler(async (req: AuthRequest, res: Response) => {
+
+});
+
