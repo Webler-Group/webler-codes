@@ -4,8 +4,11 @@ import { getTemplateSchema , createCodeSchema , deleteCodeSchema , updateCodeSch
 import { AuthRequest } from "../middleware/authMiddleware";
 import { errorHandler } from "../middleware/errorMiddleware";
 import { CodeLanguage , Code , User } from "@prisma/client";
+import { ErrorCode } from "../exceptions/enums/ErrorCode";
+import ForbiddenException from "../exceptions/ForbiddenException";
+import NotFoundException from "../exceptions/NotFoundException";
 
-export const getTemplate = errorHandler(async (req: Request, res: Response) => {
+export const getTemplate = errorHandler(async (req: AuthRequest, res: Response) => {
     getTemplateSchema.parse(req.body);
     const language: CodeLanguage = req.body.language;
     const template = await dbClient.codeTemplate.findFirst({
@@ -19,9 +22,6 @@ export const createCode = errorHandler(async (req: AuthRequest, res: Response) =
     const language: CodeLanguage = req.body.language ;
     const title: string = req.body.title ;
     const source: string = req.body.source ;
-    if(!req.user){
-        throw "Not authorized";
-    }
     const data = {
         codeLanguage: language, title, source, userId:req.user!.id
     }
@@ -29,25 +29,18 @@ export const createCode = errorHandler(async (req: AuthRequest, res: Response) =
         const code: Code = await dbClient.code.create({data});
         res.json({ success: !!code.id });
     }catch(e){
-        throw "Could not create code";
+        throw new ForbiddenException("Could not create code", ErrorCode.FORBIDDEN);
     }
 });
 
 export const deleteCode = errorHandler(async (req: AuthRequest, res: Response) => {
     deleteCodeSchema.parse(req.body);
-    const codeId = req.body.codeId ;
-    const user: User | undefined = req.user ;
-    if(!req.user){
-        throw "Not authorized";
-    }
-    if(!codeId){
-        throw "Incorrect request";
-    }
+    const codeId: bigint = req.body.codeId ;
     try{
         await dbClient.code.delete({where:{id:codeId, userId: req.user!.id}});
         res.json({ success: true });
     }catch(e){
-        throw "Delete failed";
+        throw new ForbiddenException("Could not delete. Forbidden.", ErrorCode.FORBIDDEN);
     }
 });
 
@@ -56,9 +49,6 @@ export const updateCode = errorHandler(async (req: AuthRequest, res: Response) =
     const codeId: bigint = req.body.codeId ;
     const title: string = req.body.title ;
     const source: string = req.body.source ;
-    if(!req.user){
-        throw "Not authorized";
-    }
     const queryData = {
         where:{
             id: codeId,
@@ -73,16 +63,13 @@ export const updateCode = errorHandler(async (req: AuthRequest, res: Response) =
         const code: Code = await dbClient.code.update(queryData);
         res.json({ success: !!code.id });
     }catch(e){
-        throw "Could not update code";
+        throw new ForbiddenException("Could not update. Forbidden.", ErrorCode.FORBIDDEN);
     }
 });
 
 export const getCode = errorHandler(async (req: AuthRequest, res: Response) => {
     getCodeSchema.parse(req.body);
     const codeId: bigint = req.body.codeId ;
-    if(!req.user){
-        throw "Not authorized";
-    }
     const queryData = {
         where: {
            id: codeId
@@ -98,10 +85,10 @@ export const getCode = errorHandler(async (req: AuthRequest, res: Response) => {
                   language: code!.codeLanguage,
               });
           }else{
-            throw "code is not public" ;
+              throw new ForbiddenException("Could not access. Not public. Forbidden.", ErrorCode.FORBIDDEN);
           }
         }else{
-            throw "code not found";
+            throw new NotFoundException("Code not found", ErrorCode.ROUTE_NOT_FOUND);;
         }
     }catch(e){
         throw e;

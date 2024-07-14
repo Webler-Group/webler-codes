@@ -5,7 +5,7 @@ import { Role } from "@prisma/client";
 
 const codeRouter = Router();
 
-codeRouter.post('/getTemplate', getTemplate);
+codeRouter.post('/getTemplate', [authMiddleware.bind(null, Role.USER)], getTemplate);
 codeRouter.post('/createCode', [authMiddleware.bind(null, Role.USER)], createCode);
 codeRouter.post('/deleteCode', [authMiddleware.bind(null, Role.USER)], deleteCode);
 codeRouter.post('/getCode', [authMiddleware.bind(null, Role.USER)], getCode);
