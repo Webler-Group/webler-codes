@@ -38,7 +38,7 @@ export const generateEmailVerificationCode = async (userId: bigint, username: st
  * @param userId User ID
  * @returns User
  */
-export const getAuthenticatedUser= async (userId: bigint) => {
+export const getAuthenticatedUser= async (userId: number | bigint) => {
     const user = await dbClient.user.findFirst({ where: { id: userId } });
         
     if(!user || !user.isVerified) {

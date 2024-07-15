@@ -5,11 +5,11 @@ import { Response } from 'express';
 const REFRESH_TOKEN_COOKIE = 'refreshToken';
 
 export interface TokenPayload {
-    userId: string;
+    userId: number;
 }
 
 export const generateAccessToken = (userId: bigint) => {
-    const payload = { userId: userId.toString() };
+    const payload = { userId: Number(userId) };
 
     const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, { expiresIn: '30m' });
 
@@ -17,7 +17,7 @@ export const generateAccessToken = (userId: bigint) => {
 }
 
 export const generateRefreshToken = (userId: bigint) => {
-    const payload = { userId: userId.toString() };
+    const payload = { userId: Number(userId) };
 
     const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
 

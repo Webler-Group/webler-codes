@@ -6,4 +6,4 @@ export const passwordSchema = z.string().min(6);
 
 export const emailSchema = z.string().email();
 
-export const idSchema = z.string().regex(/^[0-9]{1,18}$/); // string representation of bigint
+export const idSchema = z.number().min(1).max(Number.MAX_SAFE_INTEGER); // number representation of bigint
