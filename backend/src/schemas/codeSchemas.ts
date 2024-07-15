@@ -16,8 +16,9 @@ export const getCodeSchema = z.object({
 
 export const updateCodeSchema = z.object({
     codeId: idSchema,
-    title: z.string(),
-    source: z.string(),
+    title: z.optional(z.string()),
+    source: z.optional(z.string()),
+    isPublic: z.optional(z.boolean()),
 });
 
 export const createCodeSchema = z.object({

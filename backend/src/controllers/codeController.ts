@@ -36,22 +36,30 @@ export const deleteCode = errorHandler(async (req: AuthRequest, res: Response) =
     res.json({ success: true });
 });
 
+
 export const updateCode = errorHandler(async (req: AuthRequest, res: Response) => {
     updateCodeSchema.parse(req.body);
-    const codeId: bigint = req.body.codeId ;
-    const title: string = req.body.title ;
-    const source: string = req.body.source ;
-    const queryData = {
-        where:{
-            id: codeId,
-            userId:req.user!.id
-        },
-        data: {
-            title,
-            source,
-        }
+    if(req.body.title){
+      const queryData = {
+        where:{ id: req.body.codeId, userId:req.user!.id},
+        data:{ title:req.body.title }
+      }
+      const code: Code = await dbClient.code.update(queryData);
     }
-    const code: Code = await dbClient.code.update(queryData);
+    if(req.body.source){
+      const queryData = {
+        where:{ id: req.body.codeId, userId:req.user!.id},
+        data:{ source:req.body.source }
+      }
+      const code: Code = await dbClient.code.update(queryData);
+    }
+    if(req.body.isPublic){
+      const queryData = {
+        where:{ id: req.body.codeId, userId:req.user!.id},
+        data:{ isPublic:req.body.isPublic }
+      }
+      const code: Code = await dbClient.code.update(queryData);
+    }
     res.json({ success: true });
 });
 
