@@ -25,23 +25,15 @@ export const createCode = errorHandler(async (req: AuthRequest, res: Response) =
     const data = {
         codeLanguage: language, title, source, userId:req.user!.id
     }
-    try{
-        const code: Code = await dbClient.code.create({data});
-        res.json({ success: !!code.id });
-    }catch(e){
-        throw new ForbiddenException("Could not create code", ErrorCode.FORBIDDEN);
-    }
+    const code: Code = await dbClient.code.create({data});
+    res.json({ success: true });
 });
 
 export const deleteCode = errorHandler(async (req: AuthRequest, res: Response) => {
     deleteCodeSchema.parse(req.body);
     const codeId: bigint = req.body.codeId ;
-    try{
-        await dbClient.code.delete({where:{id:codeId, userId: req.user!.id}});
-        res.json({ success: true });
-    }catch(e){
-        throw new ForbiddenException("Could not delete. Forbidden.", ErrorCode.FORBIDDEN);
-    }
+    await dbClient.code.delete({where:{id:codeId, userId: req.user!.id}});
+    res.json({ success: true });
 });
 
 export const updateCode = errorHandler(async (req: AuthRequest, res: Response) => {
@@ -59,12 +51,8 @@ export const updateCode = errorHandler(async (req: AuthRequest, res: Response) =
             source,
         }
     }
-    try{
-        const code: Code = await dbClient.code.update(queryData);
-        res.json({ success: !!code.id });
-    }catch(e){
-        throw new ForbiddenException("Could not update. Forbidden.", ErrorCode.FORBIDDEN);
-    }
+    const code: Code = await dbClient.code.update(queryData);
+    res.json({ success: true });
 });
 
 export const getCode = errorHandler(async (req: AuthRequest, res: Response) => {
@@ -75,9 +63,8 @@ export const getCode = errorHandler(async (req: AuthRequest, res: Response) => {
            id: codeId
         }
     };
-    try{
-        const code: Code | null = await dbClient.code.findUnique(queryData);
-        if(code){
+    const code: Code | null = await dbClient.code.findUnique(queryData);
+    if(code){
           if(code!.isPublic || (req.user!.id == code!.userId)){
               res.json({
                   title: code!.title,
@@ -87,11 +74,8 @@ export const getCode = errorHandler(async (req: AuthRequest, res: Response) => {
           }else{
               throw new ForbiddenException("Could not access. Not public. Forbidden.", ErrorCode.FORBIDDEN);
           }
-        }else{
-            throw new NotFoundException("Code not found", ErrorCode.ROUTE_NOT_FOUND);;
-        }
-    }catch(e){
-        throw e;
+    }else{
+        throw new NotFoundException("Code not found", ErrorCode.ROUTE_NOT_FOUND);;
     }
 });
 
