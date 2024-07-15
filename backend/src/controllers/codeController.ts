@@ -40,25 +40,22 @@ export const deleteCode = errorHandler(async (req: AuthRequest, res: Response) =
 export const updateCode = errorHandler(async (req: AuthRequest, res: Response) => {
     updateCodeSchema.parse(req.body);
     if(req.body.title){
-      const queryData = {
+      await dbClient.code.update({
         where:{ id: req.body.codeId, userId:req.user!.id},
         data:{ title:req.body.title }
-      }
-      const code: Code = await dbClient.code.update(queryData);
+      });
     }
     if(req.body.source){
-      const queryData = {
+      await dbClient.code.update({
         where:{ id: req.body.codeId, userId:req.user!.id},
         data:{ source:req.body.source }
-      }
-      const code: Code = await dbClient.code.update(queryData);
+      });
     }
-    if(req.body.isPublic){
-      const queryData = {
+    if(req.body.isPublic !== undefined ){
+      await dbClient.code.update({
         where:{ id: req.body.codeId, userId:req.user!.id},
-        data:{ isPublic:req.body.isPublic }
-      }
-      const code: Code = await dbClient.code.update(queryData);
+        data:{ isPublic:Boolean(req.body.isPublic) }
+      });
     }
     res.json({ success: true });
 });
