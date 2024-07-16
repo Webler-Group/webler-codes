@@ -95,10 +95,12 @@ export const getCodesByFilter = errorHandler(async (req: AuthRequest, res: Respo
            id: true,
            title: true,
            source: true,
-           codeLanguage: true
+           codeLanguage: true,
+           createdAt: true,
+           updatedAt: true
         },
         orderBy:{
-           createdAt: req.body.order
+           [req.body.filter]: req.body.order
         }
     };
     type QueryResponse = {
@@ -107,10 +109,6 @@ export const getCodesByFilter = errorHandler(async (req: AuthRequest, res: Respo
         source: string
         codeLanguage: CodeLanguage
     }
-    const codes: QueryResponse[] | null = await dbClient.code.findMany(queryData);
-    if(codes){
-        res.json({codes:codes.map(c=>{let d:any={...c};d.id=Number(c.id);return d;})});
-    }else{
-        res.json({success: false})
-    }
+    const codes: QueryResponse[]  = await dbClient.code.findMany(queryData);
+    res.json({codes:codes.map(c=>{let d:any={...c};d.id=Number(c.id);return d;})});
 });

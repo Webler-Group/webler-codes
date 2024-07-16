@@ -32,7 +32,13 @@ enum Order {
   DESCENDING = "desc"
 }
 
+enum Filter {
+  CREATED_AT = "createdAt",
+  UPDATED_AT = "updatedAt"
+}
+
 export const getCodesByFilterSchema = z.object({
+    filter: z.nativeEnum(Filter),
     order: z.optional(z.nativeEnum(Order)),
     userId: z.optional(idSchema),
     language: z.optional(z.nativeEnum(CodeLanguage)),
