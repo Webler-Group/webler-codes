@@ -109,6 +109,8 @@ export const getCodesByFilter = errorHandler(async (req: AuthRequest, res: Respo
         title: string
         source: string
         codeLanguage: CodeLanguage
+        createdAt: Date
+        updatedAt: Date | null
     }
     const codes: QueryResponse[]  = await dbClient.code.findMany(queryData);
     res.json({codes:codes.map(c=>{let d:any={...c};d.id=Number(c.id);return d;})});
