@@ -88,8 +88,9 @@ export const getCodesByFilter = errorHandler(async (req: AuthRequest, res: Respo
     getCodesByFilterSchema.parse(req.body);
     const queryData = {
         where: {
-           codeLanguage: req.body.language as CodeLanguage,
-           userId: req.body.userId as bigint,
+            codeLanguage: req.body.language as CodeLanguage,
+            userId: req.body.userId as bigint,
+            ...((req.user!.id != req.body.userId) ? {isPublic: true} : {})
         },
         select: {
            id: true,
