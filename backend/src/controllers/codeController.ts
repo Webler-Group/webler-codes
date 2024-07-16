@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { dbClient } from "../services/database";
-import { getTemplateSchema , createCodeSchema , deleteCodeSchema , updateCodeSchema , getCodeSchema } from "../schemas/codeSchemas";
+import { getTemplateSchema , createCodeSchema , deleteCodeSchema , updateCodeSchema , getCodeSchema , getCodesByFilterSchema } from "../schemas/codeSchemas";
 import { AuthRequest } from "../middleware/authMiddleware";
 import { errorHandler } from "../middleware/errorMiddleware";
 import { CodeLanguage , Code , User } from "@prisma/client";
@@ -84,3 +84,33 @@ export const getCode = errorHandler(async (req: AuthRequest, res: Response) => {
     }
 });
 
+export const getCodesByFilter = errorHandler(async (req: AuthRequest, res: Response) => {
+    getCodesByFilterSchema.parse(req.body);
+    const queryData = {
+        where: {
+           codeLanguage: req.body.language as CodeLanguage,
+           userId: req.body.userId as bigint,
+        },
+        select: {
+           id: true,
+           title: true,
+           source: true,
+           codeLanguage: true
+        },
+        orderBy:{
+           createdAt: req.body.order
+        }
+    };
+    type QueryResponse = {
+        id: bigint
+        title: string
+        source: string
+        codeLanguage: CodeLanguage
+    }
+    const codes: QueryResponse[] | null = await dbClient.code.findMany(queryData);
+    if(codes){
+        res.json({codes:codes.map(c=>{let d:any={...c};d.id=Number(c.id);return d;})});
+    }else{
+        res.json({success: false})
+    }
+});

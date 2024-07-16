@@ -26,3 +26,14 @@ export const createCodeSchema = z.object({
     title: z.string(),
     source: z.string(),
 });
+
+enum Order {
+  ASCENDING = "asc",
+  DESCENDING = "desc"
+}
+
+export const getCodesByFilterSchema = z.object({
+    order: z.optional(z.nativeEnum(Order)),
+    userId: z.optional(idSchema),
+    language: z.optional(z.nativeEnum(CodeLanguage)),
+});
