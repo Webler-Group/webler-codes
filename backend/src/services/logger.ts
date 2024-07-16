@@ -21,7 +21,7 @@ const writeLogFile = (content: any): void => {
     fs.writeFileSync(logFilePath, content + '\n', { encoding: 'utf-8' });
 
     if (NODE_ENV === 'development') {
-        console.log(`Log file written at ${logFilePath}`);
+        console.log(content);
     }
 }
 

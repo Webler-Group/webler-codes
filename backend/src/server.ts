@@ -16,7 +16,7 @@ app.use(`${API_PREFIX}/auth`, authRouter);
 app.use(`${API_PREFIX}/user`, userRouter);
 
 app.get('*', (req, res, next) => {
-    next(new NotFoundException('Route does not exist', ErrorCode.ROUTE_NOT_FOUND))
+    next(new NotFoundException('Route does not exist', ErrorCode.ROUTE_NOT_FOUND));
 });
 
 app.use(errorMiddleware);
