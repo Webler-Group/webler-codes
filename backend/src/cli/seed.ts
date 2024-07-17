@@ -4,7 +4,7 @@ import { ADMIN_EMAIL, ADMIN_PASSWORD } from '../utils/globals';
 
 const dbClient = new PrismaClient();
 
-const main = async (): Promise<void> => {
+export const main = async (): Promise<void> => {
     const adminData: Prisma.UserCreateInput = {
         email: ADMIN_EMAIL,
         username: 'weblercodes',

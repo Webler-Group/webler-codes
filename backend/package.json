@@ -7,7 +7,15 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "dev": "nodemon src/server.ts",
-    "test": "jest"
+    "test": "jest",
+    "test:cli": "jest src/cli/tests/**",
+    "test:utils": "jest src/utils/tests/**",
+    "test:services": "jest src/services/tests/**",
+    "test:schemas": "jest src/schemas/tests/**",
+    "test:routes": "jest src/routes/tests/**",
+    "test:middleware": "jest src/middleware/tests/**",
+    "test:helpers": "jest src/helpers/tests/**",
+    "test:controllers": "jest src/controllers/tests/**"
   },
   "prisma": {
     "seed": "ts-node src/cli/seed.ts"
