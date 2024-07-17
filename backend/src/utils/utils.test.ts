@@ -10,7 +10,7 @@ import path from "path"
 import * as jwt from 'jsonwebtoken';
 import { Response } from 'express';
 
-import { generateRandomFileName } from "./fileUtils";
+import { generateRandomFileName } from "./utils";
 import { clearRefreshTokenCookie, generateAccessToken, generateRefreshToken, setRefreshTokenCookie } from "./tokenUtils";
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from "./globals";
 

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { LOG_DIR, NODE_ENV } from '../utils/globals';
-import { generateRandomFileName } from '../utils/fileUtils';
+import { generateRandomFileName } from '../utils/utils';
 
 /**
  * Creates log file in /logs directory

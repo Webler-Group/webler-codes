@@ -1,0 +1,15 @@
+import { Router } from "express";
+import { getTemplate , createCode , deleteCode , getCode , updateCode , getCodesByFilter } from "../controllers/codeController";
+import { authMiddleware } from "../middleware/authMiddleware";
+import { Role } from "@prisma/client";
+
+const codeRouter = Router();
+
+codeRouter.post('/getTemplate', [authMiddleware.bind(null, Role.USER)], getTemplate);
+codeRouter.post('/createCode', [authMiddleware.bind(null, Role.USER)], createCode);
+codeRouter.post('/deleteCode', [authMiddleware.bind(null, Role.USER)], deleteCode);
+codeRouter.post('/getCode', [authMiddleware.bind(null, Role.USER)], getCode);
+codeRouter.post('/updateCode', [authMiddleware.bind(null, Role.USER)], updateCode);
+codeRouter.post('/getCodesByFilter', [authMiddleware.bind(null, Role.USER)], getCodesByFilter);
+
+export default codeRouter;
