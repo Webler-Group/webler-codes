@@ -1,6 +1,6 @@
 import ForbiddenException from "../exceptions/ForbiddenException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
-import { dbClient } from "../services/database";
+import { prisma } from "../services/database";
 import { sendMail } from "../services/email";
 
 /**
@@ -13,7 +13,7 @@ import { sendMail } from "../services/email";
 export const generateEmailVerificationCode = async (userId: bigint, username: string, userEmail: string) => {
     const code = ("" + Math.random()).substring(2, 8);
 
-    const codeRecord = await dbClient.verficationCode.create({
+    const codeRecord = await prisma.verficationCode.create({
         data: {
             userId,
             code
@@ -39,7 +39,7 @@ export const generateEmailVerificationCode = async (userId: bigint, username: st
  * @returns User
  */
 export const getAuthenticatedUser= async (userId: number | bigint) => {
-    const user = await dbClient.user.findFirst({ where: { id: userId } });
+    const user = await prisma.user.findFirst({ where: { id: userId } });
         
     if(!user || !user.isVerified) {
         throw new ForbiddenException('User is not authenticated', ErrorCode.FORBIDDEN);

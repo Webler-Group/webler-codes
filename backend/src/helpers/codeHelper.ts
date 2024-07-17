@@ -1,5 +1,5 @@
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
-import { dbClient } from "../services/database";
+import { prisma } from "../services/database";
 import NotFoundException from "../exceptions/NotFoundException";
 import { Prisma } from "@prisma/client";
 import { defaultUserSelect } from "./userHelper";
@@ -22,7 +22,7 @@ export const findCodeOrThrow = async (
     where: Prisma.CodeWhereInput, 
     select: Prisma.CodeSelect = {}
 ) => {
-    const code = await dbClient.code.findFirst({ 
+    const code = await prisma.code.findFirst({ 
         where, 
         select: { 
             ...select,

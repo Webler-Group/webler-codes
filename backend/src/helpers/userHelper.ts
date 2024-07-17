@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import NotFoundException from "../exceptions/NotFoundException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
-import { dbClient } from "../services/database";
+import { prisma } from "../services/database";
 
 export const defaultUserSelect: Prisma.UserSelect = {
     id: true,
@@ -13,7 +13,7 @@ export const defaultUserSelect: Prisma.UserSelect = {
 };
 
 export const findUserOrThrow = async (where: Prisma.UserWhereInput, select: Prisma.UserSelect = {}) => {
-    const user = await dbClient.user.findFirst({ 
+    const user = await prisma.user.findFirst({ 
         where, 
         select: {
             ...select,

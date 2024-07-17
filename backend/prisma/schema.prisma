@@ -110,20 +110,19 @@ model Report {
   id             BigInt       @id @default(autoincrement())
   createdAt      DateTime     @default(now())
   message        String?      @db.VarChar(256)
-  parent         Report?      @relation("reportRelates", fields: [parentId], references: [id])
+  parent         Report?      @relation("reportRelates", fields: [parentId], references: [id], onDelete: SetNull)
   parentId       BigInt?
   children       Report[]     @relation("reportRelates")
-  author         User         @relation("authoredReports", fields: [authorId], references: [id])
-  authorId       BigInt
-  reportedUser   User         @relation("reported", fields: [reportedUserId], references: [id])
+  author         User?         @relation("authoredReports", fields: [authorId], references: [id], onDelete: SetNull)
+  authorId       BigInt?
+  reportedUser   User         @relation("reported", fields: [reportedUserId], references: [id], onDelete: Cascade)
   reportedUserId BigInt
   type           ReportType
   status         ReportStatus
   reason         ReportReason
-  assignee       User?        @relation("assignedReports", fields: [assigneeId], references: [id])
+  assignee       User?        @relation("assignedReports", fields: [assigneeId], references: [id], onDelete: SetNull)
   assigneeId     BigInt?
-  ban            Ban?         @relation(fields: [banId], references: [id])
-  banId          BigInt?      @unique
+  bans            Ban[]
   note           String?
 }
 
@@ -152,11 +151,12 @@ model Ban {
   reason        ReportReason
   banStart      DateTime     @default(now())
   banEnd        DateTime
-  user          User         @relation("banned", fields: [userId], references: [id])
+  user          User         @relation("banned", fields: [userId], references: [id], onDelete: Cascade)
   userId        BigInt
-  author        User         @relation("authoredBans", fields: [authorId], references: [id])
-  authorId      BigInt
-  relatedReport Report?
+  author        User?         @relation("authoredBans", fields: [authorId], references: [id], onDelete: SetNull)
+  authorId      BigInt?
+  relatedReport Report? @relation(fields: [relatedReportId], references: [id], onDelete: SetNull)
+  relatedReportId BigInt?
   note          String?
 }
 
@@ -200,7 +200,7 @@ model CodeTemplate {
 
 model Tag {
   name     String @id @db.VarChar(64)
-  author   User   @relation(fields: [authorId], references: [id])
-  authorId BigInt
+  author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorId BigInt?
   codes    Code[]
 }
