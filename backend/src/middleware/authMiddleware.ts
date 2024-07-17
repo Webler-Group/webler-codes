@@ -23,7 +23,7 @@ export const authMiddleware = async (role: Role, req: AuthRequest, res: Response
 
         const payload: TokenPayload = jwt.verify(accessToken, ACCESS_TOKEN_SECRET) as any;
 
-        const user = await getAuthenticatedUser(BigInt(payload.userId));
+        const user = await getAuthenticatedUser(payload.userId);
 
         if(!user.roles.includes(role)) {
             throw new ForbiddenException('User does not have required role', ErrorCode.FORBIDDEN); 

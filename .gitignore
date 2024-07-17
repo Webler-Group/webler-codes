@@ -1,2 +1,6 @@
+# Webstorm/Intellij project-specific configuration files
+.idea
+DockerFile
+
+# vscode project-specific configuration files
 .vscode
-/backend/.env

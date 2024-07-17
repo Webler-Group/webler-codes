@@ -1,10 +1,25 @@
 import { Prisma, Role, User } from "@prisma/client";
 import NotFoundException from "../exceptions/NotFoundException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
-import { dbClient } from "../services/database";
+import { prisma } from "../services/database";
 
-export const findUserOrThrow = async (where: Prisma.UserWhereInput, include: Prisma.UserInclude = {}) => {
-    const user = await dbClient.user.findFirst({ where, include });
+export const defaultUserSelect: Prisma.UserSelect = {
+    id: true,
+    username: true,
+    registeredAt: true,
+    level: true,
+    xp: true,
+    roles: true
+};
+
+export const findUserOrThrow = async (where: Prisma.UserWhereInput, select: Prisma.UserSelect = {}) => {
+    const user = await prisma.user.findFirst({ 
+        where, 
+        select: {
+            ...select,
+            ...defaultUserSelect
+        } 
+    });
     if (!user) {
         throw new NotFoundException('User not found', ErrorCode.USER_NOT_FOUND);
     }

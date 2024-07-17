@@ -1,10 +1,11 @@
 import { Prisma, PrismaClient, Role } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { ADMIN_EMAIL, ADMIN_PASSWORD } from '../utils/globals';
+import { codeTemplateSeed } from './codeTemplateSeed';
 
 const dbClient = new PrismaClient();
 
-const main = async () => {
+const main = async (): Promise<void> => {
     const adminData: Prisma.UserCreateInput = {
         email: ADMIN_EMAIL,
         username: 'weblercodes',
@@ -37,6 +38,7 @@ const main = async () => {
 }
 
 main()
+    .then(codeTemplateSeed)
     .then(async () => {
         await dbClient.$disconnect()
     })

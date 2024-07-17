@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { dbClient } from "../services/database";
+import { prisma } from "../services/database";
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import { REFRESH_TOKEN_SECRET } from "../utils/globals";
@@ -12,51 +12,53 @@ import { AuthRequest } from "../middleware/authMiddleware";
 import { clearRefreshTokenCookie, generateAccessToken, generateRefreshToken, setRefreshTokenCookie } from "../utils/tokenUtils";
 import UnauthorizedException from "../exceptions/UnauthorizedException";
 import ForbiddenException from "../exceptions/ForbiddenException";
-import { errorHandler } from "../middleware/errorMiddleware";
 import { Role } from "@prisma/client";
-import { findUserOrThrow, getUserInfo } from "../helpers/userHelper";
+import { defaultUserSelect, findUserOrThrow } from "../helpers/userHelper";
+import { bigintToNumber } from "../utils/utils";
 
 
 
-export const register = errorHandler(async (req: Request, res: Response) => {
+export const register = async (req: Request, res: Response) => {
 
     registerSchema.parse(req.body);
 
     const { username, email, password } = req.body;
 
-    let user = await dbClient.user.findFirst({ where: { username } });
+    let user = await prisma.user.findFirst({ where: { username } });
     if (user) {
         throw new BadRequestException('Username is already in use', ErrorCode.USERNAME_IS_USED);
     }
-    user = await dbClient.user.findFirst({ where: { email } });
+    user = await prisma.user.findFirst({ where: { email } });
     if (user) {
         throw new BadRequestException('Email is already in use', ErrorCode.EMAIL_IS_USED);
     }
-    user = await dbClient.user.create({
+    user = await prisma.user.create({
         data: {
             username,
             email,
             password: bcrypt.hashSync(password, 10),
             roles: [Role.USER]
-        }
+        },
+        select: defaultUserSelect
     });
 
     await generateEmailVerificationCode(user.id, username, email);
 
     res.json({
-        userInfo: getUserInfo(user)
+        success: true,
+        userInfo: bigintToNumber(user)
     });
-});
+}
 
-export const login = errorHandler(async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response) => {
     loginSchema.parse(req.body);
 
     const { email, password } = req.body;
 
-    const user = await findUserOrThrow({ email });
+    let user = await findUserOrThrow({ email });
 
     if (!bcrypt.compareSync(password, user.password)) {
-        await dbClient.user.update({
+        await prisma.user.update({
             where: { id: user.id },
             data: {
                 failedLoginCount: { increment: 1 }
@@ -73,7 +75,7 @@ export const login = errorHandler(async (req: Request, res: Response) => {
     const { accessToken, info: accessTokenInfo } = generateAccessToken(user.id);
     const { refreshToken } = generateRefreshToken(user.id);
 
-    await dbClient.user.update({
+    user = await prisma.user.update({
         where: { id: user.id },
         data: {
             lastTimeLoggedIn: new Date(),
@@ -84,15 +86,16 @@ export const login = errorHandler(async (req: Request, res: Response) => {
                     create: {}
                 }
             }
-        }
+        },
+        select: defaultUserSelect
     });
 
     setRefreshTokenCookie(res, { refreshToken });
 
-    res.json({ accessToken, accessTokenInfo, userInfo: getUserInfo(user) });
-});
+    res.json({ accessToken, accessTokenInfo, userInfo: bigintToNumber(user) });
+}
 
-export const logout = errorHandler(async (req: Request, res: Response) => {
+export const logout = async (req: Request, res: Response) => {
     const refreshToken = req.cookies?.refreshToken;
 
     if(refreshToken) {
@@ -100,9 +103,9 @@ export const logout = errorHandler(async (req: Request, res: Response) => {
     }
 
     res.json({});
-});
+}
 
-export const resendEmailVerificationCode = errorHandler(async (req: Request, res: Response) => {
+export const resendEmailVerificationCode = async (req: Request, res: Response) => {
     resendEmailVerificationCodeSchema.parse(req.body);
 
     const { email } = req.body;
@@ -118,16 +121,16 @@ export const resendEmailVerificationCode = errorHandler(async (req: Request, res
     res.json({
         success: true
     });
-});
+}
 
-export const verifyEmail = errorHandler(async (req: Request, res: Response) => {
+export const verifyEmail = async (req: Request, res: Response) => {
     verifyEmailSchema.parse(req.body);
 
     const { email, code } = req.body;
 
     const user = await findUserOrThrow({ email });
 
-    const verificationCodeRecord = await dbClient.verficationCode.findFirst({ where: { userId: user.id, code } });
+    const verificationCodeRecord = await prisma.verficationCode.findFirst({ where: { userId: user.id, code } });
     if (!verificationCodeRecord) {
         throw new NotFoundException('Verification code not found', ErrorCode.VERIFICATION_CODE_NOT_FOUND);
     }
@@ -135,23 +138,23 @@ export const verifyEmail = errorHandler(async (req: Request, res: Response) => {
         throw new BadRequestException('Verification code is expired', ErrorCode.VERIFICATION_CODE_EXPIRED);
     }
 
-    await dbClient.user.update({
+    await prisma.user.update({
         where: { id: user.id },
         data: { isVerified: true }
     });
 
-    await dbClient.verficationCode.delete({ where: { id: verificationCodeRecord.id } });
+    await prisma.verficationCode.delete({ where: { id: verificationCodeRecord.id } });
 
     res.json({
         success: true
     });
-});
+}
 
-export const getMe = errorHandler(async (req: AuthRequest, res: Response) => {
-    res.json(getUserInfo(req.user!));
-});
+export const getMe = async (req: AuthRequest, res: Response) => {
+    res.json(bigintToNumber(req.user!));
+}
 
-export const refreshToken = errorHandler(async (req: Request, res: Response) => {
+export const refreshToken = async (req: Request, res: Response) => {
     const refreshToken = req.cookies?.refreshToken;
 
     if(!refreshToken) {
@@ -163,7 +166,7 @@ export const refreshToken = errorHandler(async (req: Request, res: Response) => 
             throw new UnauthorizedException('Refresh token is invalid', ErrorCode.UNAUTHORIZED)
         }
 
-        const user = await getAuthenticatedUser(BigInt(decoded.userId));
+        const user = await getAuthenticatedUser(decoded.userId);
 
         const { accessToken, info: accessTokenInfo } = generateAccessToken(user.id);
         const { refreshToken } = generateRefreshToken(user.id);
@@ -172,4 +175,4 @@ export const refreshToken = errorHandler(async (req: Request, res: Response) => 
 
         res.json({ accessToken, accessTokenInfo });
     });
-});
+}

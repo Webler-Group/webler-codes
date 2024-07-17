@@ -33,12 +33,10 @@ services:
     environment:
       - NODE_ENV=development
     env_file:
-      - ./backend/.env
+      - ./backend/.env.development
     volumes:
-      - ./backend/package.json:/var/www/webler-codes/backend/package.json:ro
-      - ./backend/src:/var/www/webler-codes/backend/src:ro
-      - ./backend/.env:/var/www/webler-codes/backend/.env:ro
-      - ./backend/prisma/schema.prisma:/var/www/webler-codes/backend/prisma/schema.prisma:ro
+      - ./backend:/app
+      - /app/node_modules
   
   nginx:
     container_name: webler-codes-nginx
@@ -46,13 +44,22 @@ services:
     depends_on:
       - backend
     env_file:
-      - ./backend/.env
+      - ./backend/.env.development
     volumes:
-      - ./frontend/dist:/var/www/webler-codes/frontend/dist:ro
+      - ./frontend/dist:/var/www/webler-codes:ro
       - ./.docker/nginx/certs/server.crt:/etc/nginx/server.crt:ro
       - ./.docker/nginx/certs/server.key:/etc/nginx/server.key:ro
       - ./.docker/nginx/config/default.conf.template:/etc/nginx/templates/default.conf.template:ro
     ports:
       - "443:443"
       - "80:80"
-    
+  
+  postgres-test:
+    container_name: webler-codes-postgres-test
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=webler_user
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=webler_codes_localhost_test_db
+    ports:
+      - "5433:5432"
