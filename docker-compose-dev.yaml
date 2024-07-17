@@ -35,10 +35,8 @@ services:
     env_file:
       - ./backend/.env
     volumes:
-      - ./backend/src:/var/www/webler-codes/backend/src:ro
-      - ./backend/prisma:/var/www/webler-codes/backend/prisma:ro
-      - ./backend/package.json:/var/www/webler-codes/backend/package.json:ro
-      - ./backend/.env:/var/www/webler-codes/backend/.env:ro
+      - ./backend:/app
+      - /app/node_modules
   
   nginx:
     container_name: webler-codes-nginx
@@ -48,11 +46,10 @@ services:
     env_file:
       - ./backend/.env
     volumes:
-      - ./frontend/dist:/var/www/webler-codes/frontend/dist:ro
+      - ./frontend/dist:/var/www/webler-codes:ro
       - ./.docker/nginx/certs/server.crt:/etc/nginx/server.crt:ro
       - ./.docker/nginx/certs/server.key:/etc/nginx/server.key:ro
       - ./.docker/nginx/config/default.conf.template:/etc/nginx/templates/default.conf.template:ro
     ports:
       - "443:443"
       - "80:80"
-    
