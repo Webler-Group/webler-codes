@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { CodeLanguage } from '@prisma/client';
-import { idSchema } from './typeSchemas';
+import { idSchema, orderDirectionSchema, nonNegativeIntegerSchema } from './typeSchemas';
 
 export const getTemplateSchema = z.object({
     language: z.nativeEnum(CodeLanguage),
@@ -11,14 +11,14 @@ export const deleteCodeSchema = z.object({
 });
 
 export const getCodeSchema = z.object({
-    codeId: idSchema,
+    codeUID: z.string().uuid(),
 });
 
 export const updateCodeSchema = z.object({
     codeId: idSchema,
-    title: z.optional(z.string()),
-    source: z.optional(z.string()),
-    isPublic: z.optional(z.boolean()),
+    title: z.string().optional(),
+    source: z.string().optional(),
+    isPublic: z.boolean().optional(),
 });
 
 export const createCodeSchema = z.object({
@@ -27,19 +27,17 @@ export const createCodeSchema = z.object({
     source: z.string(),
 });
 
-enum Order {
-  ASCENDING = "asc",
-  DESCENDING = "desc"
-}
-
-enum Filter {
-  CREATED_AT = "createdAt",
-  UPDATED_AT = "updatedAt"
-}
-
 export const getCodesByFilterSchema = z.object({
-    filter: z.nativeEnum(Filter),
-    order: z.optional(z.nativeEnum(Order)),
-    userId: z.optional(idSchema),
-    language: z.optional(z.nativeEnum(CodeLanguage)),
+    order: z.object({
+        createdAt: orderDirectionSchema.optional(),
+        title: orderDirectionSchema.optional()
+    }),
+    filter: z.object({
+        language: z.nativeEnum(CodeLanguage).optional(),
+        userId: idSchema.optional(),
+        tags: z.string().array().optional(),
+        title: z.string().optional()
+    }),
+    offset: nonNegativeIntegerSchema,
+    count: nonNegativeIntegerSchema.min(1).max(100)
 });

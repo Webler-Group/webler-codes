@@ -3,115 +3,108 @@ import { dbClient } from "../services/database";
 import { getTemplateSchema , createCodeSchema , deleteCodeSchema , updateCodeSchema , getCodeSchema , getCodesByFilterSchema } from "../schemas/codeSchemas";
 import { AuthRequest } from "../middleware/authMiddleware";
 import { errorHandler } from "../middleware/errorMiddleware";
-import { CodeLanguage , Code , User } from "@prisma/client";
-import { ErrorCode } from "../exceptions/enums/ErrorCode";
-import ForbiddenException from "../exceptions/ForbiddenException";
-import NotFoundException from "../exceptions/NotFoundException";
+import { defaultCodeSelect, findCodeOrThrow } from "../helpers/codeHelper";
+import { bigintToNumber } from "../utils/utils";
 
 export const getTemplate = errorHandler(async (req: AuthRequest, res: Response) => {
     getTemplateSchema.parse(req.body);
-    const language: CodeLanguage = req.body.language;
+
+    const { language } = req.body;
+
     const template = await dbClient.codeTemplate.findFirst({
-        where: {language}, select: {source: true}
+        where: { language }
     });
-    res.json(template);
+
+    res.json({ source: template ? template.source : "" });
 });
 
 export const createCode = errorHandler(async (req: AuthRequest, res: Response) => {
     createCodeSchema.parse(req.body);
-    const language: CodeLanguage = req.body.language ;
-    const title: string = req.body.title ;
-    const source: string = req.body.source ;
-    const data = {
-        codeLanguage: language, title, source, userId:req.user!.id
-    }
-    const code: Code = await dbClient.code.create({data});
-    res.json({ success: true });
+
+    const { title, tags, codeLanguage, source } = req.body;
+
+    const code = await dbClient.code.create({
+        data: {
+            codeLanguage,
+            title,
+            source, 
+            userId: req.user!.id,
+            tags: {
+                connect: tags.map((x: string) => ({ name: x }))
+            }
+        },
+        select: defaultCodeSelect
+    });
+
+    res.json({ 
+        success: true, 
+        data: bigintToNumber(code)
+    });
 });
 
 export const deleteCode = errorHandler(async (req: AuthRequest, res: Response) => {
     deleteCodeSchema.parse(req.body);
-    const codeId: bigint = req.body.codeId ;
-    await dbClient.code.delete({where:{id:codeId, userId: req.user!.id}});
+
+    const codeId: bigint = req.body.codeId;
+
+    await dbClient.code.delete({where:{id:codeId}});
+
     res.json({ success: true });
 });
 
 
 export const updateCode = errorHandler(async (req: AuthRequest, res: Response) => {
     updateCodeSchema.parse(req.body);
-    if(req.body.title){
-      await dbClient.code.update({
-        where:{ id: req.body.codeId, userId:req.user!.id},
-        data:{ title:req.body.title }
-      });
-    }
-    if(req.body.source){
-      await dbClient.code.update({
-        where:{ id: req.body.codeId, userId:req.user!.id},
-        data:{ source:req.body.source }
-      });
-    }
-    if(req.body.isPublic !== undefined ){
-      await dbClient.code.update({
-        where:{ id: req.body.codeId, userId:req.user!.id},
-        data:{ isPublic:Boolean(req.body.isPublic) }
-      });
-    }
-    res.json({ success: true });
+
+    const { codeId, title, isPublic, tags, source } = req.body;
+
+    const code = await dbClient.code.update({
+        where:{ id: codeId },
+        data: {
+            tags: { set: tags.map((x: string) => ({ name: x })) },
+            title,
+            isPublic,
+            source
+        },
+        select: defaultCodeSelect
+    });
+
+    res.json({ 
+        success: true,
+        data: bigintToNumber(code)
+    });
 });
 
 export const getCode = errorHandler(async (req: AuthRequest, res: Response) => {
     getCodeSchema.parse(req.body);
-    const codeId: bigint = req.body.codeId ;
-    const queryData = {
-        where: {
-           id: codeId
-        }
-    };
-    const code: Code | null = await dbClient.code.findUnique(queryData);
-    if(code){
-          if(code!.isPublic || (req.user!.id == code!.userId)){
-              res.json({
-                  title: code!.title,
-                  source: code!.source,
-                  language: code!.codeLanguage,
-              });
-          }else{
-              throw new ForbiddenException("Could not access. Not public. Forbidden.", ErrorCode.FORBIDDEN);
-          }
-    }else{
-        throw new NotFoundException("Code not found", ErrorCode.ROUTE_NOT_FOUND);;
-    }
+
+    const codeUID = req.body.codeUID;
+    
+    const code = await findCodeOrThrow(
+        { uid: codeUID },
+        { source: true, codeVersions: { select: { name: true, createdAt: true } } }
+    );
+
+    res.json(bigintToNumber(code));
 });
 
 export const getCodesByFilter = errorHandler(async (req: AuthRequest, res: Response) => {
     getCodesByFilterSchema.parse(req.body);
-    const queryData = {
+    
+    const { filter, order, offset, count } = req.body;
+
+    const codes = await dbClient.code.findMany({
+        orderBy: order,
         where: {
-            codeLanguage: req.body.language as CodeLanguage,
-            userId: req.body.userId as bigint,
-            ...((req.user!.id != req.body.userId) ? {isPublic: true} : {})
+            codeLanguage: filter.language,
+            userId: filter.userId,
+            tags: filter.tags ? { some: { name: { in: filter.tags } } } : undefined,
+            title: filter.title
         },
-        select: {
-           id: true,
-           title: true,
-           source: true,
-           codeLanguage: true,
-           createdAt: true,
-           updatedAt: true
-        },
-        orderBy:{
-           [req.body.filter]: req.body.order
-        }
-    };
-    type QueryResponse = {
-        id: bigint
-        title: string
-        source: string
-        codeLanguage: CodeLanguage
-        createdAt: Date
-        updatedAt: Date | null
-    }
-    const codes: QueryResponse[]  = await dbClient.code.findMany(queryData);
-    res.json({codes:codes.map(c=>{let d:any={...c};d.id=Number(c.id);return d;})});
+        select: defaultCodeSelect,
+        skip: offset,
+        take: count
+    });
+
+    res.json(codes.map(x => bigintToNumber(x)));
 });

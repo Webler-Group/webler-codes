@@ -14,7 +14,8 @@ import UnauthorizedException from "../exceptions/UnauthorizedException";
 import ForbiddenException from "../exceptions/ForbiddenException";
 import { errorHandler } from "../middleware/errorMiddleware";
 import { Role } from "@prisma/client";
-import { findUserOrThrow, getUserInfo } from "../helpers/userHelper";
+import { defaultUserSelect, findUserOrThrow } from "../helpers/userHelper";
+import { bigintToNumber } from "../utils/utils";
 
 
 
@@ -38,13 +39,15 @@ export const register = errorHandler(async (req: Request, res: Response) => {
             email,
             password: bcrypt.hashSync(password, 10),
             roles: [Role.USER]
-        }
+        },
+        select: defaultUserSelect
     });
 
     await generateEmailVerificationCode(user.id, username, email);
 
     res.json({
-        userInfo: getUserInfo(user)
+        success: true,
+        userInfo: bigintToNumber(user)
     });
 });
 
@@ -53,7 +56,7 @@ export const login = errorHandler(async (req: Request, res: Response) => {
 
     const { email, password } = req.body;
 
-    const user = await findUserOrThrow({ email });
+    let user = await findUserOrThrow({ email });
 
     if (!bcrypt.compareSync(password, user.password)) {
         await dbClient.user.update({
@@ -73,7 +76,7 @@ export const login = errorHandler(async (req: Request, res: Response) => {
     const { accessToken, info: accessTokenInfo } = generateAccessToken(user.id);
     const { refreshToken } = generateRefreshToken(user.id);
 
-    await dbClient.user.update({
+    user = await dbClient.user.update({
         where: { id: user.id },
         data: {
             lastTimeLoggedIn: new Date(),
@@ -84,12 +87,13 @@ export const login = errorHandler(async (req: Request, res: Response) => {
                     create: {}
                 }
             }
-        }
+        },
+        select: defaultUserSelect
     });
 
     setRefreshTokenCookie(res, { refreshToken });
 
-    res.json({ accessToken, accessTokenInfo, userInfo: getUserInfo(user) });
+    res.json({ accessToken, accessTokenInfo, userInfo: bigintToNumber(user) });
 });
 
 export const logout = errorHandler(async (req: Request, res: Response) => {
@@ -148,7 +152,7 @@ export const verifyEmail = errorHandler(async (req: Request, res: Response) => {
 });
 
 export const getMe = errorHandler(async (req: AuthRequest, res: Response) => {
-    res.json(getUserInfo(req.user!));
+    res.json(bigintToNumber(req.user!));
 });
 
 export const refreshToken = errorHandler(async (req: Request, res: Response) => {
