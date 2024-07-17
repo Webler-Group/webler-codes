@@ -38,6 +38,7 @@ model User {
   bans             Ban[]             @relation("banned")
   authoredBans     Ban[]             @relation("authoredBans")
   codes            Code[]
+  authoredTags     Tag[]
 }
 
 model Profile {
@@ -109,21 +110,20 @@ model Report {
   id             BigInt       @id @default(autoincrement())
   createdAt      DateTime     @default(now())
   message        String?      @db.VarChar(256)
-  parent         Report?      @relation("reportRelates", fields: [parentId], references: [id])
+  parent         Report?      @relation("reportRelates", fields: [parentId], references: [id], onDelete: SetNull)
   parentId       BigInt?
   children       Report[]     @relation("reportRelates")
-  author         User         @relation("authoredReports", fields: [authorId], references: [id])
-  authorId       BigInt
-  reportedUser   User        @relation("reported", fields: [reportedUserId], references: [id])
+  author         User?         @relation("authoredReports", fields: [authorId], references: [id], onDelete: SetNull)
+  authorId       BigInt?
+  reportedUser   User         @relation("reported", fields: [reportedUserId], references: [id], onDelete: Cascade)
   reportedUserId BigInt
   type           ReportType
   status         ReportStatus
   reason         ReportReason
-  assignee       User?        @relation("assignedReports", fields: [assigneeId], references: [id])
+  assignee       User?        @relation("assignedReports", fields: [assigneeId], references: [id], onDelete: SetNull)
   assigneeId     BigInt?
-  ban            Ban?         @relation(fields: [banId], references: [id])
-  banId          BigInt?      @unique
-  note String?
+  bans            Ban[]
+  note           String?
 }
 
 enum ReportStatus {
@@ -151,29 +151,28 @@ model Ban {
   reason        ReportReason
   banStart      DateTime     @default(now())
   banEnd        DateTime
-  user          User         @relation("banned", fields: [userId], references: [id])
+  user          User         @relation("banned", fields: [userId], references: [id], onDelete: Cascade)
   userId        BigInt
-  author        User         @relation("authoredBans", fields: [authorId], references: [id])
-  authorId      BigInt
-  relatedReport Report?
-  note String?
+  author        User?         @relation("authoredBans", fields: [authorId], references: [id], onDelete: SetNull)
+  authorId      BigInt?
+  relatedReport Report? @relation(fields: [relatedReportId], references: [id], onDelete: SetNull)
+  relatedReportId BigInt?
+  note          String?
 }
 
-
-
-
 model Code {
-  id               BigInt            @id @default(autoincrement())
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime?         @updatedAt
-  isPublic         Boolean           @default(false)
-  source           String            @db.VarChar
-  title            String            @db.VarChar(64)
-  codeLanguage     CodeLanguage
-  codeVersions     CodeVersion[]
-  tags             Tag[]          
-  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId           BigInt
+  id           BigInt        @id @default(autoincrement())
+  uid          String        @unique @default(uuid())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime?     @updatedAt
+  isPublic     Boolean       @default(false)
+  source       String        @db.VarChar
+  title        String        @db.VarChar(64)
+  codeLanguage CodeLanguage
+  codeVersions CodeVersion[]
+  tags         Tag[]
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       BigInt
 }
 
 enum CodeLanguage {
@@ -185,22 +184,23 @@ enum CodeLanguage {
 }
 
 model CodeVersion {
-  id               BigInt            @id @default(autoincrement())
-  createdAt        DateTime          @default(now())
-  name             String            @db.VarChar(64)
-  source           String
-  code             Code              @relation(fields:[codeId],references:[id], onDelete: Cascade)
-  codeId           BigInt
+  id        BigInt   @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  name      String   @db.VarChar(64)
+  source    String
+  code      Code     @relation(fields: [codeId], references: [id], onDelete: Cascade)
+  codeId    BigInt
 }
 
 model CodeTemplate {
-  id               BigInt            @id @default (autoincrement())
-  language         CodeLanguage      @unique
-  source           String
+  id       BigInt       @id @default(autoincrement())
+  language CodeLanguage @unique
+  source   String
 }
 
 model Tag {
-  id               BigInt            @id @default(autoincrement())
-  name             String            @db.VarChar(64)
-  codes            Code[]
+  name     String @id @db.VarChar(64)
+  author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorId BigInt?
+  codes    Code[]
 }
