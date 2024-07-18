@@ -5,12 +5,12 @@
   "main": "server.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/server.js",
-    "dev": "nodemon src/server.ts",
+    "start": "node dist/ts/server.js",
+    "dev": "nodemon src/ts/server.ts",
     "test": "dotenv -e .env.test -- npx prisma db push --force-reset && dotenv -e .env.test -- jest -i"
   },
   "prisma": {
-    "seed": "ts-node src/cli/seed.ts"
+    "seed": "ts-node src/ts/cli/seed.ts"
   },
   "keywords": [],
   "author": "",
