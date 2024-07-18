@@ -1,15 +1,11 @@
 import { ReportReason, ReportType } from "@prisma/client";
 import {z} from "zod";
-import { idSchema } from "./typeSchemas";
+import { idSchema, nonNegativeIntegerSchema } from "./typeSchemas";
 
-const reportTypeSchema = z.enum([ReportType.PROFILE ,...Object.keys(ReportType)]);
-const reportReasonSchema = z.enum([ReportReason.INAPPROPRIATE_CONTENT ,...Object.keys(ReportReason)]);
-const durationInDaysSchema = z.number().max(365.25*100).min(1);
-const messageLength = 4096;
 export const reportUserSchema = z.object({
-    reason: reportReasonSchema,
-    type: reportTypeSchema,
-    message: z.undefined().or(z.string().max(messageLength)),
+    reason: z.nativeEnum(ReportReason),
+    type: z.nativeEnum(ReportType),
+    message: z.string().max(256).optional(),
     reportedUserId: idSchema,
 });
 
@@ -18,9 +14,9 @@ export const getReportSchema = z.object({
 });
 
 export const banUserSchema = z.object({
-    reason: reportReasonSchema,
+    reason: z.nativeEnum(ReportReason),
     userId: idSchema,
-    durationInDays: durationInDaysSchema,
+    durationInDays: nonNegativeIntegerSchema,
 });
 
 export const setParentSchema = z.object({
@@ -30,11 +26,11 @@ export const setParentSchema = z.object({
 
 export const closeReportSchema = z.object({
     reportId: idSchema,
-    note: z.string().max(messageLength).or(z.undefined()),
+    note: z.string().max(256).optional(),
     bans: z.object({
         userId: idSchema,
-        durationInDays: durationInDaysSchema,
-        reason: reportReasonSchema,
-        note: z.string().max(messageLength).or(z.undefined()),
+        durationInDays: nonNegativeIntegerSchema,
+        reason: z.nativeEnum(ReportReason),
+        note: z.string().max(256).optional()
     }).array(),
 });
