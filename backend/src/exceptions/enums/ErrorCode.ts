@@ -12,7 +12,7 @@ export const enum ErrorCode {
     CODE_NOT_FOUND = 1021,
 
     PROFILE_NOT_FOUND = 1021,
-
+    REPORT_NOT_FOUND = 1030,
     ROUTE_NOT_FOUND = 1101,
 
     UNAUTHORIZED = 2001,
