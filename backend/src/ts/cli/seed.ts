@@ -18,11 +18,23 @@ export const main = async (): Promise<void> => {
     const admin = await dbClient.user.upsert({
         where: { email: ADMIN_EMAIL },
         create: adminData,
-        update: adminData
+        update: {}
     });
 
-    console.log({ admin });
+    const testUser = await dbClient.user.upsert({
+        where: { email: 'test@test.com' },
+        create: {
+            email: 'test@test.com',
+            username: 'test',
+            password: bcrypt.hashSync('a1b2c3', 10),
+            isVerified: true,
+            roles: [Role.USER]
+        },
+        update: {}
+    });
 
+    console.log({ admin, testUser });
+    
 }
 
 main()

@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, Role, User } from "@prisma/client";
 import NotFoundException from "../exceptions/NotFoundException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
 import { prisma } from "../services/database";
@@ -23,5 +23,5 @@ export const findUserOrThrow = async (where: Prisma.UserWhereInput, select: Pris
     if (!user) {
         throw new NotFoundException('User not found', ErrorCode.USER_NOT_FOUND);
     }
-    return user;
+    return  user;
 }

@@ -7,6 +7,7 @@ import userRouter from './routes/userRouter';
 import codeRouter from './routes/codeRouter';
 import NotFoundException from './exceptions/NotFoundException';
 import { ErrorCode } from './exceptions/enums/ErrorCode';
+import { reportRouter } from './routes/reportRouter';
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(cookieParser());
 app.use(`${API_PREFIX}/auth`, authRouter);
 app.use(`${API_PREFIX}/user`, userRouter);
 app.use(`${API_PREFIX}/code`, codeRouter);
+app.use(`${API_PREFIX}/reports`, reportRouter);
 
 app.get('*', (req, res, next) => {
     next(new NotFoundException('Route does not exist', ErrorCode.ROUTE_NOT_FOUND));
