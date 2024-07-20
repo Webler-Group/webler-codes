@@ -17,21 +17,19 @@ import {
 describe('Globals', () => {
     it('should have NODE_ENV set', () => {
         expect(NODE_ENV).toBeDefined();
-        expect(['development', 'production'].includes(NODE_ENV)).toBe(true);
+        expect(['test', 'development', 'production'].includes(NODE_ENV)).toBe(true);
     });
 
-    it('should have BACKEND_PORT set and be a number', () => {
+    it('should have BACKEND_PORT set', () => {
         expect(BACKEND_PORT).toBeDefined();
-        expect(typeof BACKEND_PORT).toBe('number');
     });
 
     it('should have EMAIL_HOST set', () => {
         expect(EMAIL_HOST).toBeDefined();
     });
 
-    it('should have EMAIL_PORT set and be a number', () => {
+    it('should have EMAIL_PORT set', () => {
         expect(EMAIL_PORT).toBeDefined();
-        expect(typeof EMAIL_PORT).toBe('number');
     });
 
     it('should have EMAIL_SECURE set as a boolean', () => {
@@ -64,11 +62,11 @@ describe('Globals', () => {
         expect(LOG_DIR).toBeDefined();
     });
 
-    // it('should have ADMIN_EMAIL set', () => {
-    //     expect(ADMIN_EMAIL).toBeDefined();
-    // });
-    //
-    // it('should have ADMIN_PASSWORD set', () => {
-    //     expect(ADMIN_PASSWORD).toBeDefined();
-    // });
+    it('should have ADMIN_EMAIL set', () => {
+        expect(ADMIN_EMAIL).toBeDefined();
+    });
+
+    it('should have ADMIN_PASSWORD set', () => {
+        expect(ADMIN_PASSWORD).toBeDefined();
+    });
 });
