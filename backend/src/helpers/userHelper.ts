@@ -9,7 +9,8 @@ export const defaultUserSelect: Prisma.UserSelect = {
     registeredAt: true,
     level: true,
     xp: true,
-    roles: true
+    roles: true,
+    isVerified: true
 };
 
 export const findUserOrThrow = async (where: Prisma.UserWhereInput, select: Prisma.UserSelect = {}) => {
