@@ -28,3 +28,5 @@ app.use(errorMiddleware);
 app.listen(BACKEND_PORT, () => {
     console.log(`App listening on ${BACKEND_PORT}`);
 });
+
+export default app;

@@ -5,7 +5,7 @@ import { codeTemplateSeed } from './codeTemplateSeed';
 
 const dbClient = new PrismaClient();
 
-export const main = async (): Promise<void> => {
+const main = async (): Promise<void> => {
     const adminData: Prisma.UserCreateInput = {
         email: ADMIN_EMAIL,
         username: 'weblercodes',
@@ -21,20 +21,7 @@ export const main = async (): Promise<void> => {
         update: {}
     });
 
-    const testUser = await dbClient.user.upsert({
-        where: { email: 'test@test.com' },
-        create: {
-            email: 'test@test.com',
-            username: 'test',
-            password: bcrypt.hashSync('a1b2c3', 10),
-            isVerified: true,
-            roles: [Role.USER]
-        },
-        update: {}
-    });
-
-    console.log({ admin, testUser });
-    
+    console.log({ admin });
 }
 
 main()
