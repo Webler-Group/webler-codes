@@ -39,7 +39,7 @@ export const register = async (req: Request, res: Response) => {
             password: bcrypt.hashSync(password, 10),
             roles: [Role.USER]
         },
-        select: defaultUserSelect
+        select: { ...defaultUserSelect, email: true }
     });
 
     await generateEmailVerificationCode(user.id, username, email);
@@ -55,7 +55,7 @@ export const login = async (req: Request, res: Response) => {
 
     const { email, password } = req.body;
 
-    let user = await findUserOrThrow({ email });
+    let user = await findUserOrThrow({ email },{ password: true, email: true });
 
     if (!bcrypt.compareSync(password, user.password)) {
         await prisma.user.update({
