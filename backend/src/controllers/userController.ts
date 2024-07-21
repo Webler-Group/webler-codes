@@ -76,7 +76,23 @@ export const blockUser = async (req: AuthRequest, res: Response) => {
     if( userId == req.user!.id ){
         throw new BadRequestException("Bad request: you cannot block yourself", ErrorCode.BAD_REQUEST);
     }
-    const blockedUser = await findUserOrThrow({id: userId});
-    await prisma.userBlocks.create({data: {blockedById:req.user!.id, blockingId:userId}});
+    await findUserOrThrow({id: userId});
+
+    await prisma.userBlocks.upsert({
+        where: {
+            blockedById_blockingId: {
+                blockedById: req.user!.id,
+                blockingId: userId,
+            },
+        },
+        update: {
+            blockedById: req.user!.id,
+            blockingId: userId,
+        },
+        create: {
+            blockedById: req.user!.id,
+            blockingId: userId,
+        },
+    })
     res.json("success");
 };
