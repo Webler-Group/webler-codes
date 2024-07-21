@@ -85,10 +85,7 @@ export const blockUser = async (req: AuthRequest, res: Response) => {
                 blockingId: userId,
             },
         },
-        update: {
-            blockedById: req.user!.id,
-            blockingId: userId,
-        },
+        update: { },
         create: {
             blockedById: req.user!.id,
             blockingId: userId,
