@@ -2,6 +2,7 @@ import { Response } from "express";
 import { AuthRequest } from "../middleware/authMiddleware";
 import { followSchema, getUserSchema, blockUserSchema } from "../schemas/userSchemas";
 import { prisma } from "../services/database";
+import { Role } from "@prisma/client";
 import { findUserOrThrow } from "../helpers/userHelper";
 import BadRequestException from "../exceptions/BadRequestException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
@@ -76,8 +77,7 @@ export const blockUser = async (req: AuthRequest, res: Response) => {
     if( userId == req.user!.id ){
         throw new BadRequestException("Bad request: you cannot block yourself", ErrorCode.BAD_REQUEST);
     }
-    await findUserOrThrow({id: userId});
-
+    const blockingUser = await findUserOrThrow({id: userId, roles: {has: Role.USER}});
     await prisma.userBlocks.upsert({
         where: {
             blockedById_blockingId: {
