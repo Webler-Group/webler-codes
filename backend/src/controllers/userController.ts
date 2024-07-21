@@ -82,13 +82,13 @@ export const blockUser = async (req: AuthRequest, res: Response) => {
         where: {
             blockedById_blockingId: {
                 blockedById: req.user!.id,
-                blockingId: userId,
+                blockingId: blockingUser.id,
             },
         },
         update: { },
         create: {
             blockedById: req.user!.id,
-            blockingId: userId,
+            blockingId: blockingUser.id,
         },
     })
     res.json("success");
