@@ -8,4 +8,8 @@ export const followSchema = z.object({
 
 export const getUserSchema = z.object({
     username : usernameSchema
-})nod
+});
+
+export const blockUserSchema = z.object({
+    userId: idSchema
+});

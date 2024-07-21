@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { AuthRequest } from "../middleware/authMiddleware";
-import { followSchema, getUserSchema } from "../schemas/userSchemas";
+import { followSchema, getUserSchema, blockUserSchema } from "../schemas/userSchemas";
 import { prisma } from "../services/database";
 import { findUserOrThrow } from "../helpers/userHelper";
 import BadRequestException from "../exceptions/BadRequestException";
@@ -67,4 +67,10 @@ export const getUser = async (req: AuthRequest, res: Response) => {
   } else {
     throw new ForbiddenException("User not found", ErrorCode.PROFILE_NOT_FOUND);
   }
+};
+
+
+export const blockUser = async (req: AuthRequest, res: Response) => {
+    blockUserSchema.parse(req.body);
+    res.json("success");
 };
