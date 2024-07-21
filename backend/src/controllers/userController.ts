@@ -72,5 +72,11 @@ export const getUser = async (req: AuthRequest, res: Response) => {
 
 export const blockUser = async (req: AuthRequest, res: Response) => {
     blockUserSchema.parse(req.body);
+    const { userId } = req.body;
+    if( userId == req.user!.id ){
+        throw new BadRequestException("Bad request: you cannot block yourself", ErrorCode.BAD_REQUEST);
+    }
+    const blockedUser = await findUserOrThrow({id: userId});
+    await prisma.userBlocks.create({data: {blockedById:req.user!.id, blockingId:userId}});
     res.json("success");
 };
