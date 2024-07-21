@@ -13,3 +13,15 @@ export const getUserSchema = z.object({
 export const blockUserSchema = z.object({
     userId: idSchema
 });
+
+export const getFollowersSchema = z.object({
+    userId : idSchema,
+    offset : z.number(),
+    count : z.number()
+})
+
+export const getFollowingsSchema = z.object({
+    userId : idSchema,
+    offset : z.number(),
+    count : z.number()
+})

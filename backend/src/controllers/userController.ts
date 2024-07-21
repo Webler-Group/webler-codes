@@ -1,9 +1,9 @@
 import { Response } from "express";
 import { AuthRequest } from "../middleware/authMiddleware";
-import { followSchema, getUserSchema, blockUserSchema } from "../schemas/userSchemas";
+import { followSchema, getUserSchema, blockUserSchema, getFollowersSchema, getFollowingsSchema } from "../schemas/userSchemas";
 import { prisma } from "../services/database";
 import { Role } from "@prisma/client";
-import { findUserOrThrow } from "../helpers/userHelper";
+import { defaultUserSelect, findUserOrThrow } from "../helpers/userHelper";
 import BadRequestException from "../exceptions/BadRequestException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
 import ForbiddenException from "../exceptions/ForbiddenException";
@@ -99,3 +99,57 @@ export const blockUser = async (req: AuthRequest, res: Response) => {
     })
     res.json("success");
 };
+
+export const getFollowers = async(req: AuthRequest, res: Response) => {
+  getFollowersSchema.parse(req.body);
+  
+  const { userId , offset , count } = req.body;
+  const user = await findUserOrThrow( { id:userId } )
+  const followers = await prisma.userFollows.findMany({
+    skip:offset,
+    take:count,
+    
+    orderBy:{
+      createdAt : "desc"
+    },
+
+    where: {
+      followingId: user.id 
+    },
+
+    select:defaultUserSelect
+
+  })
+
+  res.json({
+    followers:[followers]
+  })
+
+}
+
+export const getFollowings = async(req: AuthRequest, res: Response) => {
+  getFollowingsSchema.parse(req.body);
+  
+  const { userId , offset , count } = req.body;
+  const user = await findUserOrThrow( { id:userId } )
+  const followings = await prisma.userFollows.findMany({
+    skip:offset,
+    take:count,
+
+    where: {
+      followerId:user.id
+    },
+
+    select:defaultUserSelect,
+
+    orderBy:{
+      createdAt : "desc"
+    },
+
+  })
+
+  res.json({
+    followers:[followings]
+  })
+
+}
