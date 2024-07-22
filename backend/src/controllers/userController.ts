@@ -187,9 +187,9 @@ export const updateProfile = async(req: AuthRequest, res: Response) => {
     profile = await prisma.profile.create({
       data: { userId, fullname, bio, location, workplace, education, websiteUrl }
     });
-    for(let url of socialAccounts){
-      await prisma.socialAccount.create({ data:{ profileId: profile.id, url } });
-    }
+    await prisma.socialAccount.createMany({
+      data:socialAccounts.map((url:string)=>({profileId:profile!.id,url}))
+    });
     profile = await prisma.profile.findUnique({
       where:{ userId },
       include: { socialAccounts: true }
