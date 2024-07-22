@@ -173,7 +173,7 @@ export const updateProfile = async(req: AuthRequest, res: Response) => {
     profile = await prisma.profile.update({
       where: { id : profile.id, userId: userId },
       data: {
-        fullname, bio, location, workplace, education, websiteUrl, //socialAccounts
+        fullname, bio, location, workplace, education, websiteUrl,
       }
     });
     await prisma.socialAccount.deleteMany({where:{profileId: profile!.id}});
