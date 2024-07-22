@@ -201,10 +201,11 @@ model CodeTemplate {
 }
 
 model Tag {
-  name     String @id @db.VarChar(64)
-  author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  authorId BigInt?
-  codes    Code[]
+  name        String  @id @db.VarChar(64)
+  author      User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorId    BigInt?
+  codes       Code[]
+  discussion  Discussion[]
 }
 
 model Post {
