@@ -25,3 +25,14 @@ export const getFollowingsSchema = z.object({
     offset : z.number(),
     count : z.number()
 })
+
+export const updateProfileSchema = z.object({
+    userId : idSchema,
+    fullname : z.string().optional(),
+    bio : z.string().optional(),
+    location : z.string().optional(),
+    workplace : z.string().optional(),
+    education : z.string().optional(),
+    websiteUrl : z.string().optional()
+//    connectedAccounts: [{ url },]
+});
