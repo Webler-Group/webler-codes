@@ -39,6 +39,8 @@ model User {
   authoredBans     Ban[]             @relation("authoredBans")
   codes            Code[]
   authoredTags     Tag[]
+  posts            Post[]
+  discussions      Discussion[]
 }
 
 model Profile {
