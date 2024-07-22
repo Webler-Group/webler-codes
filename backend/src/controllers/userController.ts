@@ -2,7 +2,7 @@ import { Response } from "express";
 import { AuthRequest } from "../middleware/authMiddleware";
 import { followSchema, getUserSchema, blockUserSchema, getFollowersSchema, getFollowingsSchema, updateProfileSchema } from "../schemas/userSchemas";
 import { prisma } from "../services/database";
-import { Role } from "@prisma/client";
+import { Role, SocialAccount } from "@prisma/client";
 import { defaultUserSelect, findUserOrThrow , defaultProfileSelect } from "../helpers/userHelper";
 import BadRequestException from "../exceptions/BadRequestException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
@@ -178,6 +178,22 @@ export const updateProfile = async(req: AuthRequest, res: Response) => {
         fullname, bio, location, workplace, education, websiteUrl, //socialAccounts
       }
     });
+    const accounts: SocialAccount[] = await prisma.socialAccount.findMany({where:{profileId: profile!.id}});
+    for(let account of accounts){
+      await prisma.socialAccount.delete({where:{url_profileId: {profileId:account.profileId,url:account.url}}});
+    }
+    for(let url of socialAccounts){
+      await prisma.socialAccount.create({
+        data:{
+          profileId: profile!.id,
+          url
+        }
+      });
+    }
+    profile = await prisma.profile.findUnique({
+      where:{ userId },
+      include: { socialAccounts: true }
+    });
   }
   else{
     profile = await prisma.profile.create({
@@ -197,7 +213,6 @@ export const updateProfile = async(req: AuthRequest, res: Response) => {
       where:{ userId },
       include: { socialAccounts: true }
     });
-
   }
 
   res.json({data: bigintToNumber(profile), success: true});
