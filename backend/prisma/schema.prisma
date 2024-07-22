@@ -206,3 +206,15 @@ model Tag {
   authorId BigInt?
   codes    Code[]
 }
+
+model Post {
+  id         BigInt        @id @default(autoincrement())
+  createdAt  DateTime      @default(now())
+  text       String        @db.VarChar(256)
+  updatedAt  DateTime?     @updatedAt
+}
+
+
+
+
+
