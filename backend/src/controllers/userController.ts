@@ -166,44 +166,55 @@ export const updateProfile = async(req: AuthRequest, res: Response) => {
   updateProfileSchema.parse(req.body);
 
   const {userId, fullname, bio, location, workplace, education, websiteUrl, socialAccounts } = req.body;
+  const currentUser = req.user!;
 
-  let user = await findUserOrThrow({ id: userId });
+  const user = await findUserOrThrow({ id: userId });
 
-  if(user.id != req.user!.id) {
+  if(!currentUser.roles.includes(Role.ADMIN) && user.id != currentUser.id) {
     throw new ForbiddenException("Forbidden", ErrorCode.FORBIDDEN);
   }
 
-  let profile = await prisma.profile.findUnique({
-    where:{ userId }
+  const profile = await prisma.profile.findUnique({
+    where:{ userId },
+    select: defaultProfileSelect
   });
 
-  if(profile){
-    profile = await prisma.profile.update({
-      where: { id : profile.id, userId: userId },
-      data: { fullname, bio, location, workplace, education, websiteUrl }
+  let profileData;
+  if(!profile) {
+    profileData = await prisma.profile.create({
+      data: {
+        userId,
+        fullname, 
+        bio, 
+        location, 
+        workplace, 
+        education, 
+        websiteUrl,
+        socialAccounts: socialAccounts ? {
+          createMany: { data: socialAccounts.map((url: string) => ({ url })) }
+        } : undefined
+      },
+      select: defaultProfileSelect
     });
-    await prisma.socialAccount.deleteMany({where:{profileId: profile!.id}});
-    for(let url of socialAccounts){
-      await prisma.socialAccount.create({ data:{ profileId: profile!.id, url } });
-    }
-    profile = await prisma.profile.findUnique({
-      where:{ userId },
-      include: { socialAccounts: true }
-    });
-  }
-  else{
-    profile = await prisma.profile.create({
-      data: { userId, fullname, bio, location, workplace, education, websiteUrl }
-    });
-    await prisma.socialAccount.createMany({
-      data:socialAccounts.map((url:string)=>({profileId:profile!.id,url}))
-    });
-    profile = await prisma.profile.findUnique({
-      where:{ userId },
-      include: { socialAccounts: true }
-    });
-  }
 
-  res.json({data: bigintToNumber(profile), success: true});
+  } else {
+    profileData = await prisma.profile.update({
+      where: { userId },
+      data: {
+        fullname, 
+        bio, 
+        location, 
+        workplace, 
+        education, 
+        websiteUrl,
+        socialAccounts: socialAccounts ? {
+          deleteMany: profile.socialAccounts,
+          createMany: { data: socialAccounts.map((url: string) => ({ url })) }
+        } : undefined
+      },
+      select: defaultProfileSelect
+    });
+  }
+  
+  res.json({data: bigintToNumber(profileData), success: true});
 };
-
