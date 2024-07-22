@@ -1,15 +1,20 @@
 import { Response } from "express";
 import { AuthRequest } from "../middleware/authMiddleware";
-import { followSchema, getUserSchema, blockUserSchema, getFollowersSchema, getFollowingsSchema, updateProfileSchema } from "../schemas/userSchemas";
+import { followSchema, getUserSchema, blockUserSchema, getFollowersSchema, getFollowingsSchema, updateProfileSchema, followSchemaType, updateProfileSchemaType, getFollowingsSchemaType, getFollowersSchemaType, blockUserSchemaType, getUserSchemaType } from "../schemas/userSchemas";
 import { prisma } from "../services/database";
-import { Role, SocialAccount } from "@prisma/client";
+import { Role } from "@prisma/client";
 import { defaultUserSelect, findUserOrThrow , defaultProfileSelect } from "../helpers/userHelper";
 import BadRequestException from "../exceptions/BadRequestException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
 import ForbiddenException from "../exceptions/ForbiddenException";
 import { bigintToNumber } from "../utils/utils";
 
-export const follow = async (req: AuthRequest, res: Response) => {
+/**
+ * 
+ * @param req Request
+ * @param res Response
+ */
+export const follow = async (req: AuthRequest<followSchemaType>, res: Response) => {
   followSchema.parse(req.body);
 
   const { userId, isFollow } = req.body;
@@ -39,7 +44,12 @@ export const follow = async (req: AuthRequest, res: Response) => {
   });
 };
 
-export const getUser = async (req: AuthRequest, res: Response) => {
+/**
+ * 
+ * @param req Request
+ * @param res Response
+ */
+export const getUser = async (req: AuthRequest<getUserSchemaType>, res: Response) => {
   getUserSchema.parse(req.body);
   const { username } = req.body;
 
@@ -73,16 +83,18 @@ export const getUser = async (req: AuthRequest, res: Response) => {
   }
 };
 
-
-export const blockUser = async (req: AuthRequest, res: Response) => {
+/**
+ * 
+ * @param req Request
+ * @param res Response
+ */
+export const blockUser = async (req: AuthRequest<blockUserSchemaType>, res: Response) => {
     blockUserSchema.parse(req.body);
     const { userId , isBlock } = req.body;
 
     if( userId == req.user!.id ){
         throw new BadRequestException("Bad request: you cannot block yourself", ErrorCode.BAD_REQUEST);
     }
-
-
 
     const user = await findUserOrThrow({id:userId}, )
 
@@ -98,7 +110,6 @@ export const blockUser = async (req: AuthRequest, res: Response) => {
         {NOT: {roles: {has: Role.MODERATOR}}},
       ]
     });
-
 
     if(isBlock){
      await prisma.userBlocks.delete({
@@ -127,7 +138,12 @@ export const blockUser = async (req: AuthRequest, res: Response) => {
     res.json({"success":true});
 };
 
-export const getFollowers = async(req: AuthRequest, res: Response) => {
+/**
+ * 
+ * @param req Request
+ * @param res Response
+ */
+export const getFollowers = async(req: AuthRequest<getFollowersSchemaType>, res: Response) => {
   getFollowersSchema.parse(req.body);
 
   const { userId , offset , count } = req.body;
@@ -158,7 +174,12 @@ export const getFollowers = async(req: AuthRequest, res: Response) => {
 
 }
 
-export const getFollowings = async(req: AuthRequest, res: Response) => {
+/**
+ * 
+ * @param req Request
+ * @param res Response
+ */
+export const getFollowings = async(req: AuthRequest<getFollowingsSchemaType>, res: Response) => {
   getFollowingsSchema.parse(req.body);
 
   const { userId , offset , count } = req.body;
@@ -186,7 +207,12 @@ export const getFollowings = async(req: AuthRequest, res: Response) => {
 
 }
 
-export const updateProfile = async(req: AuthRequest, res: Response) => {
+/**
+ * 
+ * @param req Request
+ * @param res Response
+ */
+export const updateProfile = async(req: AuthRequest<updateProfileSchemaType>, res: Response) => {
   updateProfileSchema.parse(req.body);
 
   const {userId, fullname, bio, location, workplace, education, websiteUrl, socialAccounts } = req.body;

@@ -1,14 +1,18 @@
-import { errorHandler } from "../middleware/errorMiddleware";
 import { Response } from "express";
 import { prisma } from "../services/database";
 import { Prisma, ReportReason, ReportStatus, ReportType} from "@prisma/client";
 import { AuthRequest } from "../middleware/authMiddleware";
-import { reportUserSchema, getReportSchema, banUserSchema, setParentSchema, closeReportSchema } from "../schemas/reportSchemas";
+import { reportUserSchema, getReportSchema, banUserSchema, setParentSchema, closeReportSchema, reportUserSchemaType, getReportSchemaType, setParentSchemaType, closeReportSchemaType, banUserSchemaType } from "../schemas/reportSchemas";
 import { calcDate, canBanUser, defaultBanSelect, defaultReportSelect, findReportOrThrow } from "../helpers/reportHelper";
 import { bigintToNumber } from "../utils/utils";
 import { findUserOrThrow } from "../helpers/userHelper";
 
-export const reportUser = async (req: AuthRequest, res: Response) => {
+/**
+ * Create new report
+ * @param req Request
+ * @param res Response
+ */
+export const reportUser = async (req: AuthRequest<reportUserSchemaType>, res: Response) => {
     reportUserSchema.parse(req.body);
 
     const reportType = req.body.type as ReportType;
@@ -19,7 +23,7 @@ export const reportUser = async (req: AuthRequest, res: Response) => {
 
     const report = await prisma.report.create({
         data:{
-            //user.id actually alaways exist in an AuthRequest after AuthMiddleware got executed
+            //user.id actually alaways exist in an Request after AuthMiddleware got executed
             authorId: currentUser.id,
             status:ReportStatus.OPENED,
             type:reportType,
@@ -36,10 +40,15 @@ export const reportUser = async (req: AuthRequest, res: Response) => {
     });
 }
 
-export const getReport = async (req: AuthRequest, res: Response)=>{
+/**
+ * Get report
+ * @param req Request
+ * @param res Response
+ */
+export const getReport = async (req: AuthRequest<getReportSchemaType>, res: Response)=>{
     getReportSchema.parse(req.body);
 
-    const reportId = req.body.reportId as bigint;
+    const reportId = req.body.reportId;
 
     const report = await findReportOrThrow(
         { id: reportId },
@@ -49,7 +58,12 @@ export const getReport = async (req: AuthRequest, res: Response)=>{
     res.json(bigintToNumber(report));
 };
 
-export const banUser = errorHandler(async (req: AuthRequest, res: Response)=> {
+/**
+ * Get report
+ * @param req Request
+ * @param res Response
+ */
+export const banUser = async (req: AuthRequest<banUserSchemaType>, res: Response)=> {
     banUserSchema.parse(req.body);
 
     const durationInDays = req.body.durationInDays as number;
@@ -74,9 +88,14 @@ export const banUser = errorHandler(async (req: AuthRequest, res: Response)=> {
         success:true,
         date: bigintToNumber(ban)
     });
-});
+}
 
-export const closeReport = errorHandler(async (req: AuthRequest, res: Response)=>{   
+/**
+ * Get report
+ * @param req Request
+ * @param res Response
+ */
+export const closeReport = async (req: AuthRequest<closeReportSchemaType>, res: Response)=>{   
     closeReportSchema.parse(req.body);
     
     const reportId = req.body.reportId;
@@ -139,9 +158,14 @@ export const closeReport = errorHandler(async (req: AuthRequest, res: Response)=
         success: true,
         data: updatedReport
     });
-});
+}
     
-export const setParent = async (req: AuthRequest, res: Response)=>{
+/**
+ * Get report
+ * @param req Request
+ * @param res Response
+ */
+export const setParent = async (req: AuthRequest<setParentSchemaType>, res: Response)=>{
     setParentSchema.parse(req.body);
 
     const reportIds = req.body.reportIds;

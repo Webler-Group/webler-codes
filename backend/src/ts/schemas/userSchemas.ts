@@ -1,33 +1,33 @@
-import { boolean, z } from "zod";
+import { z } from "zod";
 import { idSchema, nonNegativeIntegerSchema, usernameSchema } from "./typeSchemas";
 
-export const followSchema = z.object({
+const followSchema = z.object({
     userId: idSchema,
     isFollow: z.boolean()
 });
 
-export const getUserSchema = z.object({
+const getUserSchema = z.object({
     username : usernameSchema
 });
 
-export const blockUserSchema = z.object({
+const blockUserSchema = z.object({
     userId: idSchema,
     isBlock: z.boolean()
 });
 
-export const getFollowersSchema = z.object({
+const getFollowersSchema = z.object({
     userId : idSchema,
     offset : nonNegativeIntegerSchema,
     count : nonNegativeIntegerSchema
 })
 
-export const getFollowingsSchema = z.object({
+const getFollowingsSchema = z.object({
     userId : idSchema,
     offset : nonNegativeIntegerSchema,
     count : nonNegativeIntegerSchema
 })
 
-export const updateProfileSchema = z.object({
+const updateProfileSchema = z.object({
     userId : idSchema,
     fullname : z.string().optional(),
     bio : z.string().optional(),
@@ -37,3 +37,25 @@ export const updateProfileSchema = z.object({
     websiteUrl : z.string().optional(),
     socialAccounts: z.string().array().optional()
 });
+
+type followSchemaType = z.infer<typeof followSchema>;
+type getUserSchemaType = z.infer<typeof getUserSchema>;
+type blockUserSchemaType = z.infer<typeof blockUserSchema>;
+type updateProfileSchemaType = z.infer<typeof updateProfileSchema>;
+type getFollowingsSchemaType = z.infer<typeof getFollowingsSchema>;
+type getFollowersSchemaType = z.infer<typeof getFollowersSchema>;
+
+export {
+    followSchema,
+    followSchemaType,
+    getUserSchema,
+    getUserSchemaType,
+    blockUserSchema,
+    blockUserSchemaType,
+    updateProfileSchema,
+    updateProfileSchemaType,
+    getFollowersSchema,
+    getFollowersSchemaType,
+    getFollowingsSchema,
+    getFollowingsSchemaType
+}
