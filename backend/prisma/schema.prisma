@@ -213,6 +213,8 @@ model Post {
   text       String        @db.VarChar(256)
   updatedAt  DateTime?     @updatedAt
   postType   PostType
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     BigInt  
 }
 
 model Discussion {
