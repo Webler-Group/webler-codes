@@ -7,6 +7,7 @@ import { defaultUserSelect, findUserOrThrow , defaultProfileSelect } from "../he
 import BadRequestException from "../exceptions/BadRequestException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
 import ForbiddenException from "../exceptions/ForbiddenException";
+import { bigintToNumber } from "../utils/utils";
 
 export const follow = async (req: AuthRequest, res: Response) => {
   followSchema.parse(req.body);
@@ -164,15 +165,23 @@ export const updateProfile = async(req: AuthRequest, res: Response) => {
     throw new ForbiddenException("Forbidden", ErrorCode.FORBIDDEN);
   }
 
-  const profile = await prisma.profile.update({
+  const profile = await prisma.profile.upsert({
     where:{ userId },
-    data: {
-      userId, fullname, bio, location, workplace, education, websiteUrl, socialAccounts
+    update: {
+      userId, fullname, bio, location, workplace, education, websiteUrl,
+//      socialAccounts: socialAccounts? {
+//        set: socialAccounts.map((url: string)=>({userId, url}))
+//      } : undefined
+    },
+    create: {
+      userId, fullname, bio, location, workplace, education, websiteUrl,
+//      socialAccounts: {
+//        connect: socialAccounts.map((url: string)=>({url}))
+//      }
     },
     select: defaultProfileSelect
   });
 
-
-  res.json({data: profile, success: true});
+  res.json({data: bigintToNumber(profile), success: true});
 };
 
