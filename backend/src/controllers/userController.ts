@@ -165,7 +165,7 @@ export const updateProfile = async(req: AuthRequest, res: Response) => {
   }
 
   const profile = await prisma.profile.update({
-    where:{ id: userId },
+    where:{ userId },
     data: {
       userId, fullname, bio, location, workplace, education, websiteUrl, socialAccounts
     },
