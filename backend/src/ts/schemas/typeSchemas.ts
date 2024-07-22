@@ -11,7 +11,7 @@ export const passwordSchema = z.string().min(6);
 
 export const emailSchema = z.string().email();
 
-export const idSchema = z.number().min(1).max(Number.MAX_SAFE_INTEGER); // representation of bigint
+export const idSchema = z.number().min(1).max(Number.MAX_SAFE_INTEGER).transform((val) => BigInt(val));
 
 export const orderDirectionSchema = z.nativeEnum(OrderBy);
 
