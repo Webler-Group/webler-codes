@@ -117,14 +117,14 @@ export const getFollowers = async(req: AuthRequest, res: Response) => {
     },
 
     where: {
-      followingId: user.id
+      followingId: user.id,
+      
     },
-
-    select:defaultUserSelect
+    
   })
 
   res.json({
-    followers:[followers]
+    followers:[bigintToNumber(followers)],
   })
 
 }
@@ -142,8 +142,6 @@ export const getFollowings = async(req: AuthRequest, res: Response) => {
       followerId:user.id
     },
 
-    select:defaultUserSelect,
-
     orderBy:{
       createdAt : "desc"
     },
@@ -151,7 +149,7 @@ export const getFollowings = async(req: AuthRequest, res: Response) => {
   })
 
   res.json({
-    followers:[followings]
+    followings:[bigintToNumber(followings)]
   })
 
 }
