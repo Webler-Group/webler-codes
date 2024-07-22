@@ -77,8 +77,17 @@ export const getUser = async (req: AuthRequest, res: Response) => {
 export const blockUser = async (req: AuthRequest, res: Response) => {
     blockUserSchema.parse(req.body);
     const { userId } = req.body;
+    
     if( userId == req.user!.id ){
         throw new BadRequestException("Bad request: you cannot block yourself", ErrorCode.BAD_REQUEST);
+    }
+
+    const user = await findUserOrThrow({id:userId}, )
+
+    let roles = user.roles
+
+    if(roles.includes(Role.ADMIN) || roles.includes(Role.MODERATOR)){
+      throw new ForbiddenException("You cannot block a Moderator or Admin" , ErrorCode.FORBIDDEN)
     }
     const blockingUser = await findUserOrThrow({
       id: userId,
