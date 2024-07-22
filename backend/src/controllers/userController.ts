@@ -180,21 +180,11 @@ export const updateProfile = async(req: AuthRequest, res: Response) => {
   if(profile){
     profile = await prisma.profile.update({
       where: { id : profile.id, userId: userId },
-      data: {
-        fullname, bio, location, workplace, education, websiteUrl, //socialAccounts
-      }
+      data: { fullname, bio, location, workplace, education, websiteUrl }
     });
-    const accounts: SocialAccount[] = await prisma.socialAccount.findMany({where:{profileId: profile!.id}});
-    for(let account of accounts){
-      await prisma.socialAccount.delete({where:{url_profileId: {profileId:account.profileId,url:account.url}}});
-    }
+    await prisma.socialAccount.deleteMany({where:{profileId: profile!.id}});
     for(let url of socialAccounts){
-      await prisma.socialAccount.create({
-        data:{
-          profileId: profile!.id,
-          url
-        }
-      });
+      await prisma.socialAccount.create({ data:{ profileId: profile!.id, url } });
     }
     profile = await prisma.profile.findUnique({
       where:{ userId },
@@ -203,18 +193,11 @@ export const updateProfile = async(req: AuthRequest, res: Response) => {
   }
   else{
     profile = await prisma.profile.create({
-      data: {
-        userId, fullname, bio, location, workplace, education, websiteUrl,
-      }
+      data: { userId, fullname, bio, location, workplace, education, websiteUrl }
     });
-    for(let url of socialAccounts){
-      await prisma.socialAccount.create({
-        data:{
-          profileId: profile.id,
-          url
-        }
-      });
-    }
+    await prisma.socialAccount.createMany({
+      data:socialAccounts.map((url:string)=>({profileId:profile!.id,url}))
+    });
     profile = await prisma.profile.findUnique({
       where:{ userId },
       include: { socialAccounts: true }
