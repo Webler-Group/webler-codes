@@ -214,7 +214,13 @@ model Post {
   updatedAt  DateTime?     @updatedAt
 }
 
-
+enum QuizStatus {
+  DRAFT
+  APPROVED
+  REJECTED
+  WAITING_FOR_APPROVAL
+  ASSIGNED
+}
 
 
 
