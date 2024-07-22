@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { boolean, z } from "zod";
 import { idSchema, nonNegativeIntegerSchema, usernameSchema } from "./typeSchemas";
 
 export const followSchema = z.object({
@@ -11,7 +11,8 @@ export const getUserSchema = z.object({
 });
 
 export const blockUserSchema = z.object({
-    userId: idSchema
+    userId: idSchema,
+    isBlock: z.boolean()
 });
 
 export const getFollowersSchema = z.object({
