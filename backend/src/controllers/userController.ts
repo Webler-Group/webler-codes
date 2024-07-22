@@ -172,18 +172,11 @@ export const updateProfile = async(req: AuthRequest, res: Response) => {
   if(profile){
     profile = await prisma.profile.update({
       where: { id : profile.id, userId: userId },
-      data: {
-        fullname, bio, location, workplace, education, websiteUrl,
-      }
+      data: { fullname, bio, location, workplace, education, websiteUrl }
     });
     await prisma.socialAccount.deleteMany({where:{profileId: profile!.id}});
     for(let url of socialAccounts){
-      await prisma.socialAccount.create({
-        data:{
-          profileId: profile!.id,
-          url
-        }
-      });
+      await prisma.socialAccount.create({ data:{ profileId: profile!.id, url } });
     }
     profile = await prisma.profile.findUnique({
       where:{ userId },
@@ -192,17 +185,10 @@ export const updateProfile = async(req: AuthRequest, res: Response) => {
   }
   else{
     profile = await prisma.profile.create({
-      data: {
-        userId, fullname, bio, location, workplace, education, websiteUrl,
-      }
+      data: { userId, fullname, bio, location, workplace, education, websiteUrl }
     });
     for(let url of socialAccounts){
-      await prisma.socialAccount.create({
-        data:{
-          profileId: profile.id,
-          url
-        }
-      });
+      await prisma.socialAccount.create({ data:{ profileId: profile.id, url } });
     }
     profile = await prisma.profile.findUnique({
       where:{ userId },
