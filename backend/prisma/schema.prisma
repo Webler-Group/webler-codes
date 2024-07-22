@@ -214,6 +214,14 @@ model Post {
   updatedAt  DateTime?     @updatedAt
 }
 
+model Feed {
+  id         BigInt        @id @default(autoincrement())
+  createdAt  DateTime      @default(now())
+  text       String        @db.VarChar(256)
+  updatedAt  DateTime?     @updatedAt
+  isPinned   Boolean       @default(false)
+}
+
 enum QuizStatus {
   DRAFT
   APPROVED
