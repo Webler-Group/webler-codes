@@ -175,14 +175,29 @@ export const updateProfile = async(req: AuthRequest, res: Response) => {
     profile = await prisma.profile.update({
       where: { id : profile.id, userId: userId },
       data: {
-        fullname, bio, location, workplace, education, websiteUrl, socialAccounts
+        fullname, bio, location, workplace, education, websiteUrl, //socialAccounts
       }
     });
   }
   else{
     profile = await prisma.profile.create({
-      data: {userId, fullname, bio, location, workplace, education, websiteUrl, socialAccounts}
+      data: {
+        userId, fullname, bio, location, workplace, education, websiteUrl,
+      }
     });
+    for(let url of socialAccounts){
+      await prisma.socialAccount.create({
+        data:{
+          profileId: profile.id,
+          url
+        }
+      });
+    }
+    profile = await prisma.profile.findUnique({
+      where:{ userId },
+      include: { socialAccounts: true }
+    });
+
   }
 
   res.json({data: bigintToNumber(profile), success: true});
