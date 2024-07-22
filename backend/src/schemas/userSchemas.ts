@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { idSchema, usernameSchema } from "./typeSchemas";
+import { idSchema, nonNegativeIntegerSchema, usernameSchema } from "./typeSchemas";
 
 export const followSchema = z.object({
     userId: idSchema,
@@ -16,14 +16,14 @@ export const blockUserSchema = z.object({
 
 export const getFollowersSchema = z.object({
     userId : idSchema,
-    offset : z.number(),
-    count : z.number()
+    offset : nonNegativeIntegerSchema,
+    count : nonNegativeIntegerSchema
 })
 
 export const getFollowingsSchema = z.object({
     userId : idSchema,
-    offset : z.number(),
-    count : z.number()
+    offset : nonNegativeIntegerSchema,
+    count : nonNegativeIntegerSchema
 })
 
 export const updateProfileSchema = z.object({
