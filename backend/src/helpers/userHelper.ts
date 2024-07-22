@@ -20,7 +20,8 @@ export const defaultProfileSelect: Prisma.ProfileSelect = {
     location: true,
     workplace: true,
     education: true,
-    websiteUrl: true
+    websiteUrl: true,
+    socialAccounts: true
 };
 
 export const findUserOrThrow = async (where: Prisma.UserWhereInput, select: Prisma.UserSelect = {}) => {

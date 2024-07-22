@@ -156,7 +156,7 @@ export const getFollowings = async(req: AuthRequest, res: Response) => {
 export const updateProfile = async(req: AuthRequest, res: Response) => {
   updateProfileSchema.parse(req.body);
 
-  const {userId, fullname, bio, location, workplace, education, websiteUrl } = req.body;
+  const {userId, fullname, bio, location, workplace, education, websiteUrl, socialAccounts } = req.body;
 
   let user = await findUserOrThrow({ id: userId });
 
@@ -164,15 +164,15 @@ export const updateProfile = async(req: AuthRequest, res: Response) => {
     throw new ForbiddenException("Forbidden", ErrorCode.FORBIDDEN);
   }
 
-  await prisma.profile.update({
+  const profile = await prisma.profile.update({
     where:{ id: userId },
     data: {
-      userId, fullname, bio, location, workplace, education, websiteUrl
+      userId, fullname, bio, location, workplace, education, websiteUrl, socialAccounts
     },
     select: defaultProfileSelect
   });
 
 
-  res.json({data: "profile", success: true});
+  res.json({data: profile, success: true});
 };
 

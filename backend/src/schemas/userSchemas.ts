@@ -33,6 +33,6 @@ export const updateProfileSchema = z.object({
     location : z.string().optional(),
     workplace : z.string().optional(),
     education : z.string().optional(),
-    websiteUrl : z.string().optional()
-//    connectedAccounts: [{ url },]
+    websiteUrl : z.string().optional(),
+    socialAccounts: z.string().array().optional()
 });
