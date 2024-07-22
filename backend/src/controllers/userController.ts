@@ -176,10 +176,7 @@ export const updateProfile = async(req: AuthRequest, res: Response) => {
         fullname, bio, location, workplace, education, websiteUrl, //socialAccounts
       }
     });
-    const accounts: SocialAccount[] = await prisma.socialAccount.findMany({where:{profileId: profile!.id}});
-    for(let account of accounts){
-      await prisma.socialAccount.delete({where:{url_profileId: {profileId:account.profileId,url:account.url}}});
-    }
+    await prisma.socialAccount.deleteMany({where:{profileId: profile!.id}});
     for(let url of socialAccounts){
       await prisma.socialAccount.create({
         data:{
