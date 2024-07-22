@@ -43,7 +43,9 @@ export const getUser = async (req: AuthRequest, res: Response) => {
   getUserSchema.parse(req.body);
   const { username } = req.body;
 
-  const user = await findUserOrThrow({ username: username });
+  const user = await findUserOrThrow({ username: username }, { profile: true, 
+    _count: { select: { followers: true, following: true } } 
+  });
 
   const isBan = await prisma.ban.count({
     where: {
@@ -62,7 +64,7 @@ export const getUser = async (req: AuthRequest, res: Response) => {
 
   if (!isBan && !isBlocked) {
     res.json({
-      user: user.profile,
+      user: bigintToNumber(user),
       followerCount: user._count.followers,
       followingCount: user._count.following,
     });
