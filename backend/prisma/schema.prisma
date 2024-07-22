@@ -214,6 +214,14 @@ model Post {
   updatedAt  DateTime?     @updatedAt
 }
 
+model Discussion {
+  id         BigInt        @id @default(autoincrement())
+  createdAt  DateTime      @default(now())
+  text       String        @db.VarChar(1024)
+  updatedAt  DateTime?     @updatedAt
+  title      String        @db.VarChar(256)
+}
+
 model Feed {
   id         BigInt        @id @default(autoincrement())
   createdAt  DateTime      @default(now())
