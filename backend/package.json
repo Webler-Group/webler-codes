@@ -12,6 +12,9 @@
   "prisma": {
     "seed": "ts-node src/ts/cli/seed.ts"
   },
+  "nodemonConfig": {
+    "ignore": ["**/test/**"]
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
