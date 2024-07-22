@@ -13,6 +13,17 @@ export const defaultUserSelect: Prisma.UserSelect = {
     isVerified: true
 };
 
+export const defaultProfileSelect: Prisma.ProfileSelect = {
+    userId: true,
+    fullname: true,
+    bio: true,
+    location: true,
+    workplace: true,
+    education: true,
+    websiteUrl: true,
+    socialAccounts: true
+};
+
 export const findUserOrThrow = async (where: Prisma.UserWhereInput, select: Prisma.UserSelect = {}) => {
     const user = await prisma.user.findFirst({ 
         where, 
