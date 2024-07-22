@@ -76,11 +76,13 @@ export const getUser = async (req: AuthRequest, res: Response) => {
 
 export const blockUser = async (req: AuthRequest, res: Response) => {
     blockUserSchema.parse(req.body);
-    const { userId } = req.body;
-    
+    const { userId , isBlock } = req.body;
+
     if( userId == req.user!.id ){
         throw new BadRequestException("Bad request: you cannot block yourself", ErrorCode.BAD_REQUEST);
     }
+
+
 
     const user = await findUserOrThrow({id:userId}, )
 
@@ -96,7 +98,19 @@ export const blockUser = async (req: AuthRequest, res: Response) => {
         {NOT: {roles: {has: Role.MODERATOR}}},
       ]
     });
-    await prisma.userBlocks.upsert({
+
+
+    if(isBlock){
+     await prisma.userBlocks.delete({
+      where: {
+        blockedById_blockingId: {
+            blockedById: req.user!.id,
+            blockingId: blockingUser.id,
+        },
+       },
+     })
+    }else{
+      await prisma.userBlocks.upsert({
         where: {
             blockedById_blockingId: {
                 blockedById: req.user!.id,
@@ -108,7 +122,8 @@ export const blockUser = async (req: AuthRequest, res: Response) => {
             blockedById: req.user!.id,
             blockingId: blockingUser.id,
         },
-    })
+      })
+    }
     res.json({"success":true});
 };
 
