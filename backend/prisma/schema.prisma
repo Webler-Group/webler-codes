@@ -221,6 +221,9 @@ model Discussion {
   text       String        @db.VarChar(1024)
   updatedAt  DateTime?     @updatedAt
   title      String        @db.VarChar(256)
+  tags       Tag[]
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     BigInt
 }
 
 model Feed {
