@@ -109,15 +109,16 @@ export const getCodesByFilter = async (req: AuthRequest, res: Response) => {
     
     const { filter, order, offset, count } = req.body;
     const currentUser = req.user!;
+    const userId = filter.userId ?? currentUser.id;
 
     const codes = await prisma.code.findMany({
         orderBy: order,
         where: {
             codeLanguage: filter.language,
-            userId: filter.userId,
+            userId,
             tags: filter.tags ? { some: { name: { in: filter.tags } } } : undefined,
             title: filter.title,
-            isPublic: currentUser.id == filter.userId ? undefined : true
+            isPublic: (currentUser.id == userId) ? undefined : true
         },
         select: defaultCodeSelect,
         skip: offset,

@@ -1,0 +1,7 @@
+FROM nginx:1.27-alpine
+
+COPY ./.docker/nginx/config/default.conf.template /etc/nginx/templates/default.conf.template
+COPY ./.docker/nginx/certs/server.crt /etc/nginx/server.crt
+COPY ./.docker/nginx/certs/server.key /etc/nginx/server.key
+
+CMD ["nginx", "-g", "daemon off;"]
