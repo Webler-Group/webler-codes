@@ -39,6 +39,9 @@ model User {
   authoredBans     Ban[]             @relation("authoredBans")
   codes            Code[]
   authoredTags     Tag[]
+  posts            Post[]
+  discussions      Discussion[]
+  feeds            Feed[]
 }
 
 model Profile {
@@ -175,6 +178,7 @@ model Code {
   tags         Tag[]
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       BigInt
+  comments     Post[]
 }
 
 enum CodeLanguage {
@@ -201,8 +205,63 @@ model CodeTemplate {
 }
 
 model Tag {
-  name     String @id @db.VarChar(64)
-  author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  authorId BigInt?
-  codes    Code[]
+  name        String  @id @db.VarChar(64)
+  author      User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorId    BigInt?
+  codes       Code[]
+  discussion  Discussion[]
 }
+
+model Post {
+  id           BigInt        @id @default(autoincrement())
+  createdAt    DateTime      @default(now())
+  text         String        @db.VarChar(256)
+  updatedAt    DateTime?     @updatedAt
+  postType     PostType
+  isPinned     Boolean?
+  isAccepted   Boolean?
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       BigInt
+  discussion   Discussion?   @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+  discussionId BigInt    
+  code         Code?         @relation(fields: [codeId], references: [id], onDelete: Cascade)
+  codeId BigInt    
+}
+
+model Discussion {
+  id         BigInt        @id @default(autoincrement())
+  createdAt  DateTime      @default(now())
+  text       String        @db.VarChar(1024)
+  updatedAt  DateTime?     @updatedAt
+  title      String        @db.VarChar(256)
+  tags       Tag[]
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     BigInt
+  answers    Post[]
+}
+
+model Feed {
+  id         BigInt        @id @default(autoincrement())
+  createdAt  DateTime      @default(now())
+  text       String        @db.VarChar(256)
+  updatedAt  DateTime?     @updatedAt
+  isPinned   Boolean       @default(false)
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     BigInt  
+}
+
+enum PostType {
+  COMMENT
+  ANSWER
+}
+
+enum QuizStatus {
+  DRAFT
+  APPROVED
+  REJECTED
+  WAITING_FOR_APPROVAL
+  ASSIGNED
+}
+
+
+
