@@ -42,6 +42,9 @@ model User {
   posts            Post[]
   discussions      Discussion[]
   feeds            Feed[]
+  authoredQuizes   Quiz[]            @relation("authoredQuizes")
+  approvedQuizes   Quiz[]            @relation("approvedQuizes")
+  quizProgress     QuizProgress[]
 }
 
 model Profile {
@@ -92,12 +95,11 @@ model SocialAccount {
 }
 
 model UserFollows {
-  createdAt DateTime @default(now())
-  follower    User   @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  follower    User     @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
   followerId  BigInt
-  following   User   @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+  following   User     @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
   followingId BigInt
-  
 
   @@id([followerId, followingId])
 }
@@ -118,7 +120,7 @@ model Report {
   parent         Report?      @relation("reportRelates", fields: [parentId], references: [id], onDelete: SetNull)
   parentId       BigInt?
   children       Report[]     @relation("reportRelates")
-  author         User?         @relation("authoredReports", fields: [authorId], references: [id], onDelete: SetNull)
+  author         User?        @relation("authoredReports", fields: [authorId], references: [id], onDelete: SetNull)
   authorId       BigInt?
   reportedUser   User         @relation("reported", fields: [reportedUserId], references: [id], onDelete: Cascade)
   reportedUserId BigInt
@@ -127,7 +129,7 @@ model Report {
   reason         ReportReason
   assignee       User?        @relation("assignedReports", fields: [assigneeId], references: [id], onDelete: SetNull)
   assigneeId     BigInt?
-  bans            Ban[]
+  bans           Ban[]
   note           String?
 }
 
@@ -152,17 +154,17 @@ enum ReportReason {
 }
 
 model Ban {
-  id            BigInt       @id @default(autoincrement())
-  reason        ReportReason
-  banStart      DateTime     @default(now())
-  banEnd        DateTime
-  user          User         @relation("banned", fields: [userId], references: [id], onDelete: Cascade)
-  userId        BigInt
-  author        User?         @relation("authoredBans", fields: [authorId], references: [id], onDelete: SetNull)
-  authorId      BigInt?
-  relatedReport Report? @relation(fields: [relatedReportId], references: [id], onDelete: SetNull)
+  id              BigInt       @id @default(autoincrement())
+  reason          ReportReason
+  banStart        DateTime     @default(now())
+  banEnd          DateTime
+  user            User         @relation("banned", fields: [userId], references: [id], onDelete: Cascade)
+  userId          BigInt
+  author          User?        @relation("authoredBans", fields: [authorId], references: [id], onDelete: SetNull)
+  authorId        BigInt?
+  relatedReport   Report?      @relation(fields: [relatedReportId], references: [id], onDelete: SetNull)
   relatedReportId BigInt?
-  note          String?
+  note            String?
 }
 
 model Code {
@@ -205,54 +207,64 @@ model CodeTemplate {
 }
 
 model Tag {
-  name        String  @id @db.VarChar(64)
-  author      User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  authorId    BigInt?
-  codes       Code[]
-  discussion  Discussion[]
+  name       String       @id @db.VarChar(64)
+  author     User?        @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorId   BigInt?
+  codes      Code[]
+  discussion Discussion[]
+  quizes     Quiz[]
 }
 
 model Post {
-  id           BigInt        @id @default(autoincrement())
-  createdAt    DateTime      @default(now())
-  text         String        @db.VarChar(256)
-  updatedAt    DateTime?     @updatedAt
+  id           BigInt      @id @default(autoincrement())
+  createdAt    DateTime    @default(now())
+  text         String      @db.VarChar(256)
+  updatedAt    DateTime?   @updatedAt
   postType     PostType
   isPinned     Boolean?
   isAccepted   Boolean?
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       BigInt
-  discussion   Discussion?   @relation(fields: [discussionId], references: [id], onDelete: Cascade)
-  discussionId BigInt    
-  code         Code?         @relation(fields: [codeId], references: [id], onDelete: Cascade)
-  codeId BigInt    
+  discussion   Discussion? @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+  discussionId BigInt
+  code         Code?       @relation(fields: [codeId], references: [id], onDelete: Cascade)
+  codeId       BigInt
 }
 
 model Discussion {
-  id         BigInt        @id @default(autoincrement())
-  createdAt  DateTime      @default(now())
-  text       String        @db.VarChar(1024)
-  updatedAt  DateTime?     @updatedAt
-  title      String        @db.VarChar(256)
-  tags       Tag[]
-  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     BigInt
-  answers    Post[]
+  id        BigInt    @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  text      String    @db.VarChar(1024)
+  updatedAt DateTime? @updatedAt
+  title     String    @db.VarChar(256)
+  tags      Tag[]
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    BigInt
+  answers   Post[]
 }
 
 model Feed {
-  id         BigInt        @id @default(autoincrement())
-  createdAt  DateTime      @default(now())
-  text       String        @db.VarChar(256)
-  updatedAt  DateTime?     @updatedAt
-  isPinned   Boolean       @default(false)
-  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     BigInt  
+  id        BigInt    @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  text      String    @db.VarChar(256)
+  updatedAt DateTime? @updatedAt
+  isPinned  Boolean   @default(false)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    BigInt
 }
 
 enum PostType {
   COMMENT
   ANSWER
+}
+
+enum QuizQuestionType {
+  TEXT
+  SINGLECHOICE
+  MULTICHOICE
+  FILL_IN
+  ORDERING
+  MATCHING
 }
 
 enum QuizStatus {
@@ -263,5 +275,85 @@ enum QuizStatus {
   ASSIGNED
 }
 
+model Quiz {
+  id           BigInt         @id @default(autoincrement())
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime?      @updatedAt
+  title        String         @db.VarChar(64)
+  xp           Int
+  status       QuizStatus     @default(DRAFT)
+  tags         Tag[]
+  author       User?          @relation("authoredQuizes", fields: [authorId], references: [id], onDelete: SetNull)
+  authorId     BigInt?
+  approvedBy   User?          @relation("approvedQuizes", fields: [approvedById], references: [id], onDelete: SetNull)
+  approvedById BigInt?
+  questions    QuizQuestion[]
+  quizPorgress QuizProgress[]
+}
 
+model QuizQuestion {
+  id              BigInt               @id @default(autoincrement())
+  quiz            Quiz                 @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quizId          BigInt
+  type            QuizQuestionType
+  correctAnswer   String?              @db.VarChar(64)
+  text            String?              @db.VarChar(256)
+  options         QuizOption[]
+  questionResults QuizQuestionResult[]
+}
 
+model QuizOption {
+  id            BigInt       @id @default(autoincrement())
+  question      QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId    BigInt
+  correctAnswer String?      @db.VarChar(64)
+  text          String?      @db.VarChar(256)
+  isCorrect     Boolean?
+  correctIndex  Int?
+  answers       QuizAnswer[]
+}
+
+model QuizProgress {
+  user                     User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                   BigInt
+  quiz                     Quiz                 @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quizId                   BigInt
+  currentQuestionNumber    Int                  @default(1)
+  currentQuestionStartTime DateTime
+  isCompleted              Boolean              @default(false)
+  xpEarned                 Int                  @default(0)
+  questionResults          QuizQuestionResult[]
+
+  @@id([userId, quizId])
+}
+
+model QuizQuestionResult {
+  progress       QuizProgress @relation(fields: [userId, quizId], references: [userId, quizId], onDelete: Cascade)
+  userId         BigInt
+  quizId         BigInt
+  question       QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId     BigInt
+  answer         String?      @db.VarChar(64)
+  answerTime     DateTime?
+  isAnswered     Boolean      @default(false)
+  isCorrect      Boolean      @default(false)
+  questionNumber Int
+  startTime      DateTime?
+  answers        QuizAnswer[]
+
+  @@id([userId, quizId, questionId])
+}
+
+model QuizAnswer {
+  questionResult QuizQuestionResult @relation(fields: [userId, quizId, questionId], references: [userId, quizId, questionId], onDelete: Cascade)
+  userId         BigInt
+  quizId         BigInt
+  questionId     BigInt
+  option         QuizOption         @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  optionId       BigInt
+  answer         String?            @db.VarChar(64)
+  selected       Boolean?
+  index          Int?
+
+  @@id([userId, quizId, questionId, optionId])
+}
