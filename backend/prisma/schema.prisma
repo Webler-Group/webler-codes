@@ -42,17 +42,17 @@ model User {
 }
 
 model Profile {
-  id            BigInt          @id @default(autoincrement())
-  fullname      String?         @db.VarChar(64)
-  avatarUrl     String?
-  bio           String          @default("") @db.VarChar(256)
-  location      String?         @db.VarChar(64)
-  workplace     String?         @db.VarChar(64)
-  education     String?         @db.VarChar(64)
-  websiteUrl    String?         @db.VarChar(64)
-  SocialAccount SocialAccount[]
-  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId        BigInt          @unique
+  id             BigInt          @id @default(autoincrement())
+  fullname       String?         @db.VarChar(64)
+  avatarUrl      String?
+  bio            String          @default("") @db.VarChar(256)
+  location       String?         @db.VarChar(64)
+  workplace      String?         @db.VarChar(64)
+  education      String?         @db.VarChar(64)
+  websiteUrl     String?         @db.VarChar(64)
+  socialAccounts SocialAccount[]
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         BigInt          @unique
 }
 
 enum Role {
@@ -89,10 +89,12 @@ model SocialAccount {
 }
 
 model UserFollows {
+  createdAt DateTime @default(now())
   follower    User   @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
   followerId  BigInt
   following   User   @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
   followingId BigInt
+  
 
   @@id([followerId, followingId])
 }

@@ -40,16 +40,15 @@ services:
   
   nginx:
     container_name: webler-codes-nginx
-    image: nginx:1.27-alpine
+    build:
+      context: .
+      dockerfile: ./.docker/Dockerfile-nginx
     depends_on:
       - backend
     env_file:
       - ./backend/.env.development
     volumes:
-      - ./frontend/dist:/var/www/webler-codes:ro
-      - ./.docker/nginx/certs/server.crt:/etc/nginx/server.crt:ro
-      - ./.docker/nginx/certs/server.key:/etc/nginx/server.key:ro
-      - ./.docker/nginx/config/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - .:/var/www/webler-codes:ro
     ports:
       - "443:443"
       - "80:80"
