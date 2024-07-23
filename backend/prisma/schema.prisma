@@ -41,6 +41,7 @@ model User {
   authoredTags     Tag[]
   posts            Post[]
   discussions      Discussion[]
+  feeds            Feed[]
 }
 
 model Profile {
@@ -177,6 +178,7 @@ model Code {
   tags         Tag[]
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       BigInt
+  comments     Post[]
 }
 
 enum CodeLanguage {
@@ -211,13 +213,19 @@ model Tag {
 }
 
 model Post {
-  id         BigInt        @id @default(autoincrement())
-  createdAt  DateTime      @default(now())
-  text       String        @db.VarChar(256)
-  updatedAt  DateTime?     @updatedAt
-  postType   PostType
-  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     BigInt  
+  id           BigInt        @id @default(autoincrement())
+  createdAt    DateTime      @default(now())
+  text         String        @db.VarChar(256)
+  updatedAt    DateTime?     @updatedAt
+  postType     PostType
+  isPinned     Boolean?
+  isAccepted   Boolean?
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       BigInt
+  discussion   Discussion?   @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+  discussionId BigInt    
+  code         Code?         @relation(fields: [codeId], references: [id], onDelete: Cascade)
+  codeId BigInt    
 }
 
 model Discussion {
@@ -229,6 +237,7 @@ model Discussion {
   tags       Tag[]
   user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     BigInt
+  answers    Post[]
 }
 
 model Feed {
@@ -237,6 +246,8 @@ model Feed {
   text       String        @db.VarChar(256)
   updatedAt  DateTime?     @updatedAt
   isPinned   Boolean       @default(false)
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     BigInt  
 }
 
 enum PostType {
