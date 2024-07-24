@@ -26,6 +26,7 @@ export const createDiscussion = async (req: AuthRequest<createDiscussionSchemaTy
  * @param res Response
  */
 export const deleteDiscussion = async (req: AuthRequest<deleteDiscussionSchemaType>, res: Response) => {
+  deleteDiscussionSchema.parse(req.body);
   res.json({});
 }
 
@@ -35,6 +36,7 @@ export const deleteDiscussion = async (req: AuthRequest<deleteDiscussionSchemaTy
  * @param res Response
  */
 export const updateDiscussion = async (req: AuthRequest<updateDiscussionSchemaType>, res: Response) => {
+  updateDiscussionSchema.parse(req.body);
   res.json({});
 }
 
@@ -44,6 +46,7 @@ export const updateDiscussion = async (req: AuthRequest<updateDiscussionSchemaTy
  * @param res Response
  */
 export const getDiscussion = async (req: AuthRequest<getDiscussionSchemaType>, res: Response) => {
+  getDiscussionSchema.parse(req.body);
   res.json({});
 }
 
@@ -53,6 +56,7 @@ export const getDiscussion = async (req: AuthRequest<getDiscussionSchemaType>, r
  * @param res Response
  */
 export const getDiscussionsByFilter = async (req: AuthRequest<getDiscussionsByFilterSchemaType>, res: Response) => {
+  getDiscussionsByFilterSchema.parse(req.body);
   res.json({});
 }
 
