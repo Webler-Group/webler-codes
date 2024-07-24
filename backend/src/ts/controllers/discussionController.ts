@@ -3,7 +3,7 @@ import { prisma } from "../services/database";
 import { createDiscussionSchema , deleteDiscussionSchema , updateDiscussionSchema , getDiscussionSchema , getDiscussionsByFilterSchema } from "../schemas/discussionSchemas";
 import { createDiscussionSchemaType, deleteDiscussionSchemaType, updateDiscussionSchemaType, getDiscussionSchemaType, getDiscussionsByFilterSchemaType } from "../schemas/discussionSchemas";
 import { AuthRequest } from "../middleware/authMiddleware";
-import { defaultCodeSelect, findCodeOrThrow } from "../helpers/codeHelper";
+import { defaultDiscussionSelect, findDiscussionOrThrow } from "../helpers/discussionHelper";
 import { bigintToNumber } from "../utils/utils";
 import ForbiddenException from "../exceptions/ForbiddenException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
@@ -17,7 +17,24 @@ import { Role } from "@prisma/client";
 export const createDiscussion = async (req: AuthRequest<createDiscussionSchemaType>, res: Response) => {
   createDiscussionSchema.parse(req.body);
   const { title, text, tags } = req.body;
-  res.json({});
+  const currentUser = req.user!;
+
+  const discussion = await prisma.discussion.create({
+    data: {
+      text,
+      title,
+      userId: currentUser.id,
+        tags: {
+          connect: tags!.map((x: string) => ({ name: x }))
+        }
+      },
+      select: defaultDiscussionSelect
+    });
+
+    res.json({
+        success: true,
+        data: bigintToNumber(discussion)
+    });
 }
 
 /**
