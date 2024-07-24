@@ -1,6 +1,7 @@
 import { Response } from "express";
 import { prisma } from "../services/database";
-import { getTemplateSchema , createCodeSchema , deleteCodeSchema , updateCodeSchema , getCodeSchema , getCodesByFilterSchema, createCodeSchemaType, getTemplateSchemaType, deleteCodeSchemaType, updateCodeSchemaType, getCodeSchemaType, getCodesByFilterSchemaType } from "../schemas/codeSchemas";
+import { createDiscussionSchema , deleteDiscussionSchema , updateDiscussionSchema , getDiscussionSchema , getDiscussionsByFilterSchema } from "../schemas/discussionSchemas";
+import { createDiscussionSchemaType, deleteDiscussionSchemaType, updateDiscussionSchemaType, getDiscussionSchemaType, getDiscussionsByFilterSchemaType } from "../schemas/discussionSchemas";
 import { AuthRequest } from "../middleware/authMiddleware";
 import { defaultCodeSelect, findCodeOrThrow } from "../helpers/codeHelper";
 import { bigintToNumber } from "../utils/utils";
@@ -13,7 +14,9 @@ import { Role } from "@prisma/client";
  * @param req Request
  * @param res Response
  */
-export const createDiscussion = async (req: AuthRequest<getTemplateSchemaType>, res: Response) => {
+export const createDiscussion = async (req: AuthRequest<createDiscussionSchemaType>, res: Response) => {
+  createDiscussionSchema.parse(req.body);
+  const { title, text } = req.body;
   res.json({});
 }
 
@@ -22,7 +25,7 @@ export const createDiscussion = async (req: AuthRequest<getTemplateSchemaType>, 
  * @param req Request
  * @param res Response
  */
-export const deleteDiscussion = async (req: AuthRequest<createCodeSchemaType>, res: Response) => {
+export const deleteDiscussion = async (req: AuthRequest<deleteDiscussionSchemaType>, res: Response) => {
   res.json({});
 }
 
@@ -31,7 +34,7 @@ export const deleteDiscussion = async (req: AuthRequest<createCodeSchemaType>, r
  * @param req Request
  * @param res Response
  */
-export const updateDiscussion = async (req: AuthRequest<deleteCodeSchemaType>, res: Response) => {
+export const updateDiscussion = async (req: AuthRequest<updateDiscussionSchemaType>, res: Response) => {
   res.json({});
 }
 
@@ -40,7 +43,7 @@ export const updateDiscussion = async (req: AuthRequest<deleteCodeSchemaType>, r
  * @param req Request
  * @param res Response
  */
-export const getDiscussionById = async (req: AuthRequest<updateCodeSchemaType>, res: Response) => {
+export const getDiscussion = async (req: AuthRequest<getDiscussionSchemaType>, res: Response) => {
   res.json({});
 }
 
@@ -49,7 +52,7 @@ export const getDiscussionById = async (req: AuthRequest<updateCodeSchemaType>, 
  * @param req Request
  * @param res Response
  */
-export const getDiscussionsByFilter = async (req: AuthRequest<updateCodeSchemaType>, res: Response) => {
+export const getDiscussionsByFilter = async (req: AuthRequest<getDiscussionsByFilterSchemaType>, res: Response) => {
   res.json({});
 }
 
