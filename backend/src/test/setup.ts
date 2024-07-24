@@ -29,6 +29,7 @@ process.env.ADMIN_PASSWORD = "testAdminPassword";
  *      SQL (`TRUNCATE TABLE users CASCADE`)
  * then inserting the users as mentioned, respectively.
  */
+// TRUNCATE TABLE "User" RESTART IDENTITY CASCADE;
 const seedTestDatabase = async (): Promise<void> => {
     await prisma.$executeRaw`TRUNCATE TABLE "User" CASCADE;`;
 
@@ -46,18 +47,6 @@ const seedTestDatabase = async (): Promise<void> => {
     await prisma.user.upsert({
         where: { email: ADMIN_EMAIL },
         create: adminData,
-        update: {}
-    });
-
-    await prisma.user.upsert({
-        where: { email: 'test@test.com' },
-        create: {
-            email: 'test@test.com',
-            username: 'test',
-            password: bcrypt.hashSync('a1b2c3', 10),
-            isVerified: true,
-            roles: [Role.USER]
-        },
         update: {}
     });
 };
