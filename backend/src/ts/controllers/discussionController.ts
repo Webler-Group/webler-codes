@@ -65,8 +65,29 @@ export const deleteDiscussion = async (req: AuthRequest<deleteDiscussionSchemaTy
  */
 export const updateDiscussion = async (req: AuthRequest<updateDiscussionSchemaType>, res: Response) => {
   updateDiscussionSchema.parse(req.body);
-  const { title, text, tags } = req.body;
-  res.json({});
+  const { discussionId, title, text, tags } = req.body;
+  const currentUser = req.user!;
+
+  let discussion = await findDiscussionOrThrow({ id: discussionId }, { id: true, userId: true });
+
+  if(discussion.userId != currentUser.id) {
+    throw new ForbiddenException("Forbidden", ErrorCode.FORBIDDEN);
+  }
+
+  discussion = await prisma.discussion.update({
+    where:{ id: discussionId },
+    data: {
+      tags: tags ? { set: tags.map((x: string) => ({ name: x })) } : undefined,
+      title,
+      text
+    },
+    select: defaultDiscussionSelect
+  });
+
+  res.json({
+    success: true,
+    data: bigintToNumber(discussion)
+  });
 }
 
 /**
@@ -77,7 +98,8 @@ export const updateDiscussion = async (req: AuthRequest<updateDiscussionSchemaTy
 export const getDiscussion = async (req: AuthRequest<getDiscussionSchemaType>, res: Response) => {
   getDiscussionSchema.parse(req.body);
   const { discussionId } = req.body ;
-  res.json({});
+  const discussion = await findDiscussionOrThrow({ id: discussionId });
+  res.json(bigintToNumber(discussion));
 }
 
 /**
