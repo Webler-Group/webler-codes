@@ -25,7 +25,7 @@ export const createDiscussion = async (req: AuthRequest<createDiscussionSchemaTy
       title,
       userId: currentUser.id,
         tags: {
-          connect: tags!.map((x: string) => ({ name: x }))
+          connect: tags.map((x: string) => ({ name: x }))
         }
       },
       select: defaultDiscussionSelect

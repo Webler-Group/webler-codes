@@ -20,7 +20,7 @@ const updateDiscussionSchema = z.object({
 const createDiscussionSchema = z.object({
     title: z.string(),
     text: z.string(),
-    tags: z.string().array().optional()
+    tags: z.string().array()
 });
 
 const getDiscussionsByFilterSchema = z.object({
