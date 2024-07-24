@@ -44,7 +44,18 @@ export const createDiscussion = async (req: AuthRequest<createDiscussionSchemaTy
  */
 export const deleteDiscussion = async (req: AuthRequest<deleteDiscussionSchemaType>, res: Response) => {
   deleteDiscussionSchema.parse(req.body);
-  res.json({});
+  const { discussionId } = req.body;
+  const currentUser = req.user!;
+
+  let discussion = await findDiscussionOrThrow({ id: discussionId }, { id: true, userId: true });
+
+  if(!currentUser.roles.includes(Role.ADMIN) && discussion.userId != currentUser.id) {
+    throw new ForbiddenException("Forbidden", ErrorCode.FORBIDDEN);
+  }
+
+  await prisma.discussion.delete({where:{id:discussionId}});
+
+  res.json({ success: true });
 }
 
 /**

@@ -3,7 +3,7 @@ import {  } from '@prisma/client';
 import { idSchema, orderDirectionSchema, nonNegativeIntegerSchema } from './typeSchemas';
 
 const deleteDiscussionSchema = z.object({
-    discussioneId: idSchema,
+    discussionId: idSchema,
 });
 
 const getDiscussionSchema = z.object({
