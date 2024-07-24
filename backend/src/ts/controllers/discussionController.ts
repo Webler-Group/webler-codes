@@ -110,6 +110,21 @@ export const getDiscussion = async (req: AuthRequest<getDiscussionSchemaType>, r
 export const getDiscussionsByFilter = async (req: AuthRequest<getDiscussionsByFilterSchemaType>, res: Response) => {
   getDiscussionsByFilterSchema.parse(req.body);
   const { order, filter, offset, count } = req.body;
-  res.json({});
+  const currentUser = req.user!;
+  const userId = filter.userId ?? currentUser.id;
+
+  const discussions = await prisma.discussion.findMany({
+    orderBy: order,
+    where: {
+      userId,
+      tags: filter.tags ? { some: { name: { in: filter.tags } } } : undefined,
+      title: filter.title,
+    },
+    select: defaultDiscussionSelect,
+    skip: offset,
+    take: count
+  });
+
+  res.json(discussions.map(x => bigintToNumber(x)));
 }
 
