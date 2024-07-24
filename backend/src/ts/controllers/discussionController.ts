@@ -16,7 +16,7 @@ import { Role } from "@prisma/client";
  */
 export const createDiscussion = async (req: AuthRequest<createDiscussionSchemaType>, res: Response) => {
   createDiscussionSchema.parse(req.body);
-  const { title, text } = req.body;
+  const { title, text, tags } = req.body;
   res.json({});
 }
 
@@ -37,6 +37,7 @@ export const deleteDiscussion = async (req: AuthRequest<deleteDiscussionSchemaTy
  */
 export const updateDiscussion = async (req: AuthRequest<updateDiscussionSchemaType>, res: Response) => {
   updateDiscussionSchema.parse(req.body);
+  const { title, text, tags } = req.body;
   res.json({});
 }
 
@@ -47,6 +48,7 @@ export const updateDiscussion = async (req: AuthRequest<updateDiscussionSchemaTy
  */
 export const getDiscussion = async (req: AuthRequest<getDiscussionSchemaType>, res: Response) => {
   getDiscussionSchema.parse(req.body);
+  const { discussionId } = req.body ;
   res.json({});
 }
 
@@ -57,6 +59,7 @@ export const getDiscussion = async (req: AuthRequest<getDiscussionSchemaType>, r
  */
 export const getDiscussionsByFilter = async (req: AuthRequest<getDiscussionsByFilterSchemaType>, res: Response) => {
   getDiscussionsByFilterSchema.parse(req.body);
+  const { order, filter, offset, count } = req.body;
   res.json({});
 }
 
