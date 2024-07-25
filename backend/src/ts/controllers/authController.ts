@@ -61,9 +61,15 @@ export const register = async (req: AuthRequest<registerSchemaType>, res: Respon
 export const login = async (req: AuthRequest<loginSchemaType>, res: Response) => {
     loginSchema.parse(req.body);
 
-    const { email, password } = req.body;
+    const { email, password, username } = req.body;
 
-    let user = await findUserOrThrow({ email },{ password: true, email: true });
+    let user = username ?
+        await findUserOrThrow({ username },{ password: true, username: true }):
+        await findUserOrThrow({ email },{ password: true, email: true });
+
+    if(!user.isVerified) {
+        throw new ForbiddenException('User is not verified', ErrorCode.FORBIDDEN);
+    }
 
     if (!bcrypt.compareSync(password, user.password)) {
         await prisma.user.update({
@@ -73,11 +79,7 @@ export const login = async (req: AuthRequest<loginSchemaType>, res: Response) =>
             }
         });
 
-        throw new BadRequestException('Password is not correct', ErrorCode.INCORRECT_PASSWORD);
-    }
-
-    if(!user.isVerified) {
-        throw new ForbiddenException('User is not verified', ErrorCode.FORBIDDEN);
+        throw new BadRequestException('Password is incorrect', ErrorCode.INCORRECT_PASSWORD);
     }
     
     const { accessToken, info: accessTokenInfo } = generateAccessToken(user.id);

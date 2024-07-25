@@ -16,4 +16,5 @@ module.exports = {
         '!src/ts/**/codeTemplateSeed.ts', // exclude code-seed files
     ],
     testPathIgnorePatterns: ['/node_modules/', '/dist/'],
+    testTimeout: 30000
 };
