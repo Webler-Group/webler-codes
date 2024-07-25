@@ -13,7 +13,9 @@
     "seed": "ts-node src/ts/cli/seed.ts"
   },
   "nodemonConfig": {
-    "ignore": ["**/test/**"]
+    "ignore": [
+      "**/test/**"
+    ]
   },
   "keywords": [],
   "author": "",
@@ -39,6 +41,7 @@
   "dependencies": {
     "@prisma/client": "^5.17.0",
     "bcryptjs": "^2.4.3",
+    "bull": "^4.15.1",
     "cookie-parser": "^1.4.6",
     "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",

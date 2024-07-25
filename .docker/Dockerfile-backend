@@ -1,9 +1,16 @@
-FROM node:20-alpine
+FROM node:alpine
+
+RUN apk add --no-cache \
+    openssh
 
 RUN mkdir -p /app && chown node:node /app
+
 WORKDIR /app
 
 USER node
+
+RUN ssh-keygen
+
 COPY --chown=node:node ./backend/package.json ./package.json
 
 RUN npm install

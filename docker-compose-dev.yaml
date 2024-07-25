@@ -62,3 +62,19 @@ services:
       - POSTGRES_DB=webler_codes_localhost_test_db
     ports:
       - "5433:5432"
+
+  redis:
+    container_name: webler-codes-redis
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+  dind:
+    container_name: webler-codes-dind
+    build:
+      context: .
+      dockerfile: ./.docker/Dockerfile-dind
+    environment:
+      - AUTHORIZED_KEYS=ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC8b/e751r2lhyMNIJU/L3U7dQh66dCzitgEOz6cOd/fUuIMjvQ1KnnR8+FIijMpGEwKvIN/ejb3uCwVJbtD7kgXYuN0IAcgyCamks2UBchjVveXCJndsDdqMyhgQbTouKHugsgjUX+5tEc2dr7W/xVXUpo3q2soDhALfu2KyfRzq7EYmBFf53OJ7dljGoytbRP+Wz+A9nzoHjsq2Qc9A/RX1ZnWr+05f/0gD+C2yNCpUpRzUCUxCrXZUIqNR8fv1YNX19+8T0Ke/KR8Gr+mCMDAk1dwhOdbssQm1Idwa/bc6yYmhNSt0c9UO4pJFr1h6yEOrqCMfz/KJdPviTAp7PGUe2DsDw7Zu4RjVhTCNALNNwkrZYnw1fBr6kFrAmVvLSFu2O2z77a0q5Wd9dLfzB1l181FB1jVF8RkC3bw+U/qHKe4seOlqHG996G2CQ5AcCcP+dqg9uZFQ3FRaKKR+4i5cMD91JJFHYKMQT2pYVFVcOHATwccs1NDwy65CrDMAE= kira@Albion
+    privileged: true
+    ports:
+      - "10022:22"
