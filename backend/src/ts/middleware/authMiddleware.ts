@@ -9,11 +9,12 @@ import { getAuthenticatedUser } from "../helpers/authHelper";
 import HttpException from "../exceptions/HttpException";
 import ForbiddenException from "../exceptions/ForbiddenException";
 
-export interface AuthRequest extends Request {
-    user?: User
+export interface AuthRequest<T> extends Request {
+    body: T;
+    user?: User;
 }
 
-export const authMiddleware = async (role: Role, req: AuthRequest, res: Response, next: NextFunction) => {
+export const authMiddleware = async <T>(role: Role, req: AuthRequest<T>, res: Response, next: NextFunction) => {
     try {
         const accessToken = req.headers.authorization;
 

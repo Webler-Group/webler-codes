@@ -5,21 +5,23 @@ import * as jwt from 'jsonwebtoken';
 import { REFRESH_TOKEN_SECRET } from "../utils/globals";
 import BadRequestException from "../exceptions/BadRequestException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
-import { loginSchema, registerSchema, resendEmailVerificationCodeSchema, verifyEmailSchema } from "../schemas/authSchemas";
+import { loginSchema, loginSchemaType, registerSchema, registerSchemaType, resendEmailVerificationCodeSchema, resendEmailVerificationCodeSchemaType, verifyEmailSchema, verifyEmailSchemaType } from "../schemas/authSchemas";
 import NotFoundException from "../exceptions/NotFoundException";
 import { generateEmailVerificationCode, getAuthenticatedUser } from "../helpers/authHelper";
-import { AuthRequest } from "../middleware/authMiddleware";
 import { clearRefreshTokenCookie, generateAccessToken, generateRefreshToken, setRefreshTokenCookie } from "../utils/tokenUtils";
 import UnauthorizedException from "../exceptions/UnauthorizedException";
 import ForbiddenException from "../exceptions/ForbiddenException";
 import { Role } from "@prisma/client";
 import { defaultUserSelect, findUserOrThrow } from "../helpers/userHelper";
 import { bigintToNumber } from "../utils/utils";
-import {z} from "zod";
+import { AuthRequest } from "../middleware/authMiddleware";
 
-
-
-export const register = async (req: Request, res: Response) => {
+/**
+ * Create new user
+ * @param req Request
+ * @param res Response
+ */
+export const register = async (req: AuthRequest<registerSchemaType>, res: Response) => {
 
     registerSchema.parse(req.body);
 
@@ -51,16 +53,15 @@ export const register = async (req: Request, res: Response) => {
     });
 }
 
-export const login = async (req: Request, res: Response) => {
-    try {
-        loginSchema.parse(req.body);
-    } catch(e) {
-        if (e instanceof z.ZodError) {
-            throw new BadRequestException('A registered email or username is required', ErrorCode.FORBIDDEN);
-        }
-    }
+/**
+ * Authorize user and generate tokens
+ * @param req Request
+ * @param res Response
+ */
+export const login = async (req: AuthRequest<loginSchemaType>, res: Response) => {
+    loginSchema.parse(req.body);
 
-    const { username, email, password } = req.body;
+    const { email, password, username } = req.body;
 
     let user = username ?
         await findUserOrThrow({ username },{ password: true, username: true }):
@@ -104,7 +105,12 @@ export const login = async (req: Request, res: Response) => {
     res.json({ accessToken, accessTokenInfo, userInfo: bigintToNumber(user) });
 }
 
-export const logout = async (req: Request, res: Response) => {
+/**
+ * Delete token cookie
+ * @param req Request
+ * @param res Response
+ */
+export const logout = async (req: AuthRequest<{}>, res: Response) => {
     const refreshToken = req.cookies?.refreshToken;
 
     if(refreshToken) {
@@ -114,7 +120,12 @@ export const logout = async (req: Request, res: Response) => {
     res.json({});
 }
 
-export const resendEmailVerificationCode = async (req: Request, res: Response) => {
+/**
+ * Create email verifiction code
+ * @param req Request
+ * @param res Response
+ */
+export const resendEmailVerificationCode = async (req: AuthRequest<resendEmailVerificationCodeSchemaType>, res: Response) => {
     resendEmailVerificationCodeSchema.parse(req.body);
 
     const { email } = req.body;
@@ -132,7 +143,12 @@ export const resendEmailVerificationCode = async (req: Request, res: Response) =
     });
 }
 
-export const verifyEmail = async (req: Request, res: Response) => {
+/**
+ * Compare verification code
+ * @param req Request
+ * @param res Response
+ */
+export const verifyEmail = async (req: AuthRequest<verifyEmailSchemaType>, res: Response) => {
     verifyEmailSchema.parse(req.body);
 
     const { email, code } = req.body;
@@ -159,11 +175,16 @@ export const verifyEmail = async (req: Request, res: Response) => {
     });
 }
 
-export const getMe = async (req: AuthRequest, res: Response) => {
-    res.json(bigintToNumber(req.user!));
+/**
+ * Get logged user
+ * @param req Request
+ * @param res Response
+ */
+export const getMe = async (req: AuthRequest<any>, res: Response) => {
+    res.json(bigintToNumber(req.user));
 }
 
-export const refreshToken = async (req: Request, res: Response) => {
+export const refreshToken = async (req: Request<any>, res: Response) => {
     const refreshToken = req.cookies?.refreshToken;
 
     if(!refreshToken) {

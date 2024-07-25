@@ -1,13 +1,19 @@
 import { Response } from "express";
 import { prisma } from "../services/database";
-import { getTemplateSchema , createCodeSchema , deleteCodeSchema , updateCodeSchema , getCodeSchema , getCodesByFilterSchema } from "../schemas/codeSchemas";
+import { getTemplateSchema , createCodeSchema , deleteCodeSchema , updateCodeSchema , getCodeSchema , getCodesByFilterSchema, createCodeSchemaType, getTemplateSchemaType, deleteCodeSchemaType, updateCodeSchemaType, getCodeSchemaType, getCodesByFilterSchemaType } from "../schemas/codeSchemas";
 import { AuthRequest } from "../middleware/authMiddleware";
 import { defaultCodeSelect, findCodeOrThrow } from "../helpers/codeHelper";
 import { bigintToNumber } from "../utils/utils";
 import ForbiddenException from "../exceptions/ForbiddenException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
+import { Role } from "@prisma/client";
 
-export const getTemplate = async (req: AuthRequest, res: Response) => {
+/**
+ * Get code template
+ * @param req Request
+ * @param res Response
+ */
+export const getTemplate = async (req: AuthRequest<getTemplateSchemaType>, res: Response) => {
     getTemplateSchema.parse(req.body);
 
     const { language } = req.body;
@@ -19,7 +25,12 @@ export const getTemplate = async (req: AuthRequest, res: Response) => {
     res.json({ source: template ? template.source : "" });
 }
 
-export const createCode = async (req: AuthRequest, res: Response) => {
+/**
+ * Create new code
+ * @param req Request
+ * @param res Response
+ */
+export const createCode = async (req: AuthRequest<createCodeSchemaType>, res: Response) => {
     createCodeSchema.parse(req.body);
 
     const { title, tags, language, source } = req.body;
@@ -44,7 +55,12 @@ export const createCode = async (req: AuthRequest, res: Response) => {
     });
 }
 
-export const deleteCode = async (req: AuthRequest, res: Response) => {
+/**
+ * Delete code
+ * @param req Request
+ * @param res Response
+ */
+export const deleteCode = async (req: AuthRequest<deleteCodeSchemaType>, res: Response) => {
     deleteCodeSchema.parse(req.body);
 
     const { codeId } = req.body;
@@ -52,7 +68,7 @@ export const deleteCode = async (req: AuthRequest, res: Response) => {
 
     let code = await findCodeOrThrow({ id: codeId }, { id: true, userId: true });
 
-    if(code.userId != currentUser.id) {
+    if(!currentUser.roles.includes(Role.ADMIN) && code.userId != currentUser.id) {
         throw new ForbiddenException("Forbidden", ErrorCode.FORBIDDEN);
     }
 
@@ -61,8 +77,12 @@ export const deleteCode = async (req: AuthRequest, res: Response) => {
     res.json({ success: true });
 }
 
-
-export const updateCode = async (req: AuthRequest, res: Response) => {
+/**
+ * Update code
+ * @param req Request
+ * @param res Response
+ */
+export const updateCode = async (req: AuthRequest<updateCodeSchemaType>, res: Response) => {
     updateCodeSchema.parse(req.body);
 
     const { codeId, title, isPublic, tags, source } = req.body;
@@ -77,7 +97,7 @@ export const updateCode = async (req: AuthRequest, res: Response) => {
     code = await prisma.code.update({
         where:{ id: codeId },
         data: {
-            tags: { set: tags.map((x: string) => ({ name: x })) },
+            tags: tags ? { set: tags.map((x: string) => ({ name: x })) } : undefined,
             title,
             isPublic,
             source
@@ -91,7 +111,12 @@ export const updateCode = async (req: AuthRequest, res: Response) => {
     });
 }
 
-export const getCode = async (req: AuthRequest, res: Response) => {
+/**
+ * Get code details
+ * @param req Request
+ * @param res Response
+ */
+export const getCode = async (req: AuthRequest<getCodeSchemaType>, res: Response) => {
     getCodeSchema.parse(req.body);
 
     const codeUID = req.body.codeUID;
@@ -104,7 +129,12 @@ export const getCode = async (req: AuthRequest, res: Response) => {
     res.json(bigintToNumber(code));
 }
 
-export const getCodesByFilter = async (req: AuthRequest, res: Response) => {
+/**
+ * Get many codes
+ * @param req Request
+ * @param res Response
+ */
+export const getCodesByFilter = async (req: AuthRequest<getCodesByFilterSchemaType>, res: Response) => {
     getCodesByFilterSchema.parse(req.body);
     
     const { filter, order, offset, count } = req.body;

@@ -2,32 +2,34 @@ import { z } from 'zod';
 import { CodeLanguage } from '@prisma/client';
 import { idSchema, orderDirectionSchema, nonNegativeIntegerSchema } from './typeSchemas';
 
-export const getTemplateSchema = z.object({
+const getTemplateSchema = z.object({
     language: z.nativeEnum(CodeLanguage),
 });
 
-export const deleteCodeSchema = z.object({
+const deleteCodeSchema = z.object({
     codeId: idSchema,
 });
 
-export const getCodeSchema = z.object({
+const getCodeSchema = z.object({
     codeUID: z.string().uuid(),
 });
 
-export const updateCodeSchema = z.object({
+const updateCodeSchema = z.object({
     codeId: idSchema,
     title: z.string().optional(),
     source: z.string().optional(),
     isPublic: z.boolean().optional(),
+    tags: z.string().array().optional()
 });
 
-export const createCodeSchema = z.object({
+const createCodeSchema = z.object({
     language: z.nativeEnum(CodeLanguage),
     title: z.string(),
     source: z.string(),
+    tags: z.string().array()
 });
 
-export const getCodesByFilterSchema = z.object({
+const getCodesByFilterSchema = z.object({
     order: z.object({
         createdAt: orderDirectionSchema.optional(),
         title: orderDirectionSchema.optional()
@@ -41,3 +43,25 @@ export const getCodesByFilterSchema = z.object({
     offset: nonNegativeIntegerSchema,
     count: nonNegativeIntegerSchema.min(1).max(100)
 });
+
+type getTemplateSchemaType = z.infer<typeof getTemplateSchema>;
+type deleteCodeSchemaType = z.infer<typeof deleteCodeSchema>;
+type getCodeSchemaType = z.infer<typeof getCodeSchema>;
+type updateCodeSchemaType = z.infer<typeof updateCodeSchema>;
+type createCodeSchemaType = z.infer<typeof createCodeSchema>;
+type getCodesByFilterSchemaType = z.infer<typeof getCodesByFilterSchema>;
+
+export {
+    getCodeSchema,
+    getCodeSchemaType,
+    getTemplateSchema,
+    getTemplateSchemaType,
+    getCodesByFilterSchema,
+    getCodesByFilterSchemaType,
+    deleteCodeSchema,
+    deleteCodeSchemaType,
+    updateCodeSchema,
+    updateCodeSchemaType,
+    createCodeSchema,
+    createCodeSchemaType
+}
