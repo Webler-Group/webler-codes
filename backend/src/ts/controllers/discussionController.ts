@@ -2,6 +2,8 @@ import { Response } from "express";
 import { prisma } from "../services/database";
 import { createDiscussionSchema , deleteDiscussionSchema , updateDiscussionSchema , getDiscussionSchema , getDiscussionsByFilterSchema } from "../schemas/discussionSchemas";
 import { createDiscussionSchemaType, deleteDiscussionSchemaType, updateDiscussionSchemaType, getDiscussionSchemaType, getDiscussionsByFilterSchemaType } from "../schemas/discussionSchemas";
+import { createAnswerSchema } from "../schemas/discussionSchemas";
+import { createAnswerSchemaType } from "../schemas/discussionSchemas";
 import { AuthRequest } from "../middleware/authMiddleware";
 import { defaultDiscussionSelect, findDiscussionOrThrow } from "../helpers/discussionHelper";
 import { bigintToNumber } from "../utils/utils";
@@ -24,17 +26,18 @@ export const createDiscussion = async (req: AuthRequest<createDiscussionSchemaTy
       text,
       title,
       userId: currentUser.id,
-        tags: {
-          connect: tags.map((x: string) => ({ name: x }))
-        }
-      },
-      select: defaultDiscussionSelect
-    });
+      tags: {
+        connectOrCreate:
+          tags.map((x:string)=>({where:{name:x},create:{name:x,authorId:currentUser.id}}))
+      }
+    },
+    select: defaultDiscussionSelect
+  });
 
-    res.json({
-        success: true,
-        data: bigintToNumber(discussion)
-    });
+  res.json({
+    success: true,
+    data: bigintToNumber(discussion)
+  });
 }
 
 /**
@@ -128,3 +131,6 @@ export const getDiscussionsByFilter = async (req: AuthRequest<getDiscussionsByFi
   res.json(discussions.map(x => bigintToNumber(x)));
 }
 
+export const createAnswer = async (req: AuthRequest<createAnswerSchemaType>, res: Response) => {
+
+}

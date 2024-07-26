@@ -37,11 +37,18 @@ const getDiscussionsByFilterSchema = z.object({
     count: nonNegativeIntegerSchema.min(1).max(100)
 });
 
+const createAnswerSchema = z.object({
+  text: z.string(),
+  discussionId: idSchema
+});
+
+
 type deleteDiscussionSchemaType = z.infer<typeof deleteDiscussionSchema>;
 type getDiscussionSchemaType = z.infer<typeof getDiscussionSchema>;
 type updateDiscussionSchemaType = z.infer<typeof updateDiscussionSchema>;
 type createDiscussionSchemaType = z.infer<typeof createDiscussionSchema>;
 type getDiscussionsByFilterSchemaType = z.infer<typeof getDiscussionsByFilterSchema>;
+type createAnswerSchemaType = z.infer<typeof createAnswerSchema>;
 
 export {
     getDiscussionSchema,
@@ -49,10 +56,12 @@ export {
     deleteDiscussionSchema,
     updateDiscussionSchema,
     createDiscussionSchema,
+    createAnswerSchema,
 
     getDiscussionSchemaType,
     getDiscussionsByFilterSchemaType,
     deleteDiscussionSchemaType,
     updateDiscussionSchemaType,
     createDiscussionSchemaType,
+    createAnswerSchemaType,
 }
