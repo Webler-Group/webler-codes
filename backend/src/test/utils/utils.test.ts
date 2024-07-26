@@ -1,6 +1,13 @@
-import { generateRandomFileName, bigintToNumber } from '../../ts/utils/utils';
+import {generateRandomFileName, bigintToNumber } from '../../ts/utils/utils';
 
 describe('Utils', () => {
+    describe("get string resources", () => {
+        it("Ensure strings are retrived from locale=en", async() => {
+            // always fail.. untill after implementation
+            expect(true).toBe(false);
+        })
+    })
+
     describe('generateRandomFileName', () => {
         it('should generate a string in the expected format', () => {
             const fileName = generateRandomFileName();

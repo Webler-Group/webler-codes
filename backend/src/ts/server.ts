@@ -8,6 +8,7 @@ import codeRouter from './routes/codeRouter';
 import NotFoundException from './exceptions/NotFoundException';
 import { ErrorCode } from './exceptions/enums/ErrorCode';
 import { reportRouter } from './routes/reportRouter';
+import discussionRouter from './routes/discussionRouter';
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(`${API_PREFIX}/auth`, authRouter);
 app.use(`${API_PREFIX}/user`, userRouter);
 app.use(`${API_PREFIX}/code`, codeRouter);
 app.use(`${API_PREFIX}/reports`, reportRouter);
+app.use(`${API_PREFIX}/discussion`, discussionRouter);
 
 app.get('*', (req, res, next) => {
     next(new NotFoundException('Route does not exist', ErrorCode.ROUTE_NOT_FOUND));
