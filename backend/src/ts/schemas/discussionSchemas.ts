@@ -55,7 +55,6 @@ const getSortedAnswersSchema = z.object({
     discussionId: idSchema,
     order: z.object({
         createdAt: orderDirectionSchema.optional(),
-        likesCount: orderDirectionSchema.optional()
     }),
     offset: nonNegativeIntegerSchema,
     count: nonNegativeIntegerSchema.min(1).max(100)

@@ -176,8 +176,14 @@ export const updateAnswer = async (req: AuthRequest<updateAnswerSchemaType>, res
 
 export const getSortedAnswers = async (req: AuthRequest<getSortedAnswersSchemaType>, res: Response) => {
   getSortedAnswersSchema.parse(req.body);
-  const { discussionId, } = req.body;
+  const { discussionId, order, offset, count } = req.body;
   const discussion = await findDiscussionOrThrow({id: discussionId});
-  const answers = await prisma.post.findMany({where: {discussionId}, select:defaultAnswerSelect });
-  res.json(answers);
+  const answers = await prisma.post.findMany({
+    where: {discussionId},
+    orderBy: order,
+    skip: offset,
+    take: count,
+    select:defaultAnswerSelect
+  });
+  res.json(answers.map(x=>bigintToNumber(x)));
 }
