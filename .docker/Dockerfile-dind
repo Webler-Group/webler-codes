@@ -3,16 +3,12 @@ FROM docker:27.1.1-dind-alpine3.20
 RUN apk add --no-cache \ 
     openssh
 
-# disable password auth - a no-go in any case
-RUN echo "PermitRootLogin prohibit-password" >> /etc/ssh/sshd_config && \
-	echo "PasswordAuthentication no" >> /etc/ssh/sshd_config && \
-	echo "ClientAliveInterval 120" >> /etc/ssh/sshd_config && \  
-	echo "ClientAliveCountMax 720" >> /etc/ssh/sshd_config
+RUN echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config && \
+	echo "PermitEmptyPasswords yes" >> /etc/ssh/sshd_config && \
+    echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
 
 COPY ./.docker/dind/entrypoint.sh /
 RUN chmod +x /entrypoint.sh
-
-COPY ./.docker/backend/ssh/id_rsa.pub /
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD []

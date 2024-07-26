@@ -9,8 +9,6 @@ WORKDIR /app
 
 USER node
 
-RUN ssh-keygen
-
 COPY --chown=node:node ./backend/package.json ./package.json
 
 RUN npm install
