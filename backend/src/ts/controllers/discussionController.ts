@@ -2,10 +2,10 @@ import { Response } from "express";
 import { prisma } from "../services/database";
 import { createDiscussionSchema , deleteDiscussionSchema , updateDiscussionSchema , getDiscussionSchema , getDiscussionsByFilterSchema } from "../schemas/discussionSchemas";
 import { createDiscussionSchemaType, deleteDiscussionSchemaType, updateDiscussionSchemaType, getDiscussionSchemaType, getDiscussionsByFilterSchemaType } from "../schemas/discussionSchemas";
-import { createAnswerSchema } from "../schemas/discussionSchemas";
-import { createAnswerSchemaType } from "../schemas/discussionSchemas";
+import { createAnswerSchema, deleteAnswerSchema } from "../schemas/discussionSchemas";
+import { createAnswerSchemaType, deleteAnswerSchemaType } from "../schemas/discussionSchemas";
 import { AuthRequest } from "../middleware/authMiddleware";
-import { defaultDiscussionSelect, findDiscussionOrThrow, defaultAnswerSelect } from "../helpers/discussionHelper";
+import { defaultDiscussionSelect, findDiscussionOrThrow, defaultAnswerSelect, findAnswerOrThrow } from "../helpers/discussionHelper";
 import { bigintToNumber } from "../utils/utils";
 import ForbiddenException from "../exceptions/ForbiddenException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
@@ -146,4 +146,12 @@ export const createAnswer = async (req: AuthRequest<createAnswerSchemaType>, res
     select: defaultAnswerSelect
   });
   res.json({success:true, data:bigintToNumber(answer)});
+}
+
+export const deleteAnswer = async (req: AuthRequest<deleteAnswerSchemaType>, res: Response) => {
+  deleteAnswerSchema.parse(req.body);
+  const { answerId } = req.body;
+  const answer = await findAnswerOrThrow( {id: answerId, postType: PostType.ANSWER} );
+  await prisma.post.delete({where: {id: answer.id}});
+  res.json({});
 }
