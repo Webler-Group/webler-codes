@@ -9,6 +9,7 @@ import NotFoundException from './exceptions/NotFoundException';
 import { ErrorCode } from './exceptions/enums/ErrorCode';
 import { reportRouter } from './routes/reportRouter';
 import discussionRouter from './routes/discussionRouter';
+import quizRouter from './routes/quizRouter';
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(`${API_PREFIX}/user`, userRouter);
 app.use(`${API_PREFIX}/code`, codeRouter);
 app.use(`${API_PREFIX}/reports`, reportRouter);
 app.use(`${API_PREFIX}/discussion`, discussionRouter);
+app.use(`${API_PREFIX}/quiz`, quizRouter);
 
 app.get('*', (req, res, next) => {
     next(new NotFoundException('Route does not exist', ErrorCode.ROUTE_NOT_FOUND));
