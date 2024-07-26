@@ -2,8 +2,8 @@ import { Response } from "express";
 import { prisma } from "../services/database";
 import { createDiscussionSchema , deleteDiscussionSchema , updateDiscussionSchema , getDiscussionSchema , getDiscussionsByFilterSchema } from "../schemas/discussionSchemas";
 import { createDiscussionSchemaType, deleteDiscussionSchemaType, updateDiscussionSchemaType, getDiscussionSchemaType, getDiscussionsByFilterSchemaType } from "../schemas/discussionSchemas";
-import { createAnswerSchema, deleteAnswerSchema, updateAnswerSchema } from "../schemas/discussionSchemas";
-import { createAnswerSchemaType, deleteAnswerSchemaType, updateAnswerSchemaType } from "../schemas/discussionSchemas";
+import { createAnswerSchema, deleteAnswerSchema, updateAnswerSchema, getSortedAnswersSchema } from "../schemas/discussionSchemas";
+import { createAnswerSchemaType, deleteAnswerSchemaType, updateAnswerSchemaType, getSortedAnswersSchemaType } from "../schemas/discussionSchemas";
 import { AuthRequest } from "../middleware/authMiddleware";
 import { defaultDiscussionSelect, findDiscussionOrThrow, defaultAnswerSelect, findAnswerOrThrow } from "../helpers/discussionHelper";
 import { bigintToNumber } from "../utils/utils";
@@ -172,4 +172,9 @@ export const updateAnswer = async (req: AuthRequest<updateAnswerSchemaType>, res
     select: defaultAnswerSelect
   });
   res.json({success:true, data: bigintToNumber(answer)});
+}
+
+export const getSortedAnswers = async (req: AuthRequest<getSortedAnswersSchemaType>, res: Response) => {
+
+  res.json({});
 }

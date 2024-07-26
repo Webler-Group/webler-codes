@@ -51,6 +51,15 @@ const updateAnswerSchema = z.object({
     text: z.string().optional(),
 });
 
+const getSortedAnswersSchema = z.object({
+    order: z.object({
+        createdAt: orderDirectionSchema.optional(),
+        likesCount: orderDirectionSchema.optional()
+    }),
+    offset: nonNegativeIntegerSchema,
+    count: nonNegativeIntegerSchema.min(1).max(100)
+});
+
 type deleteDiscussionSchemaType = z.infer<typeof deleteDiscussionSchema>;
 type getDiscussionSchemaType = z.infer<typeof getDiscussionSchema>;
 type updateDiscussionSchemaType = z.infer<typeof updateDiscussionSchema>;
@@ -59,6 +68,7 @@ type getDiscussionsByFilterSchemaType = z.infer<typeof getDiscussionsByFilterSch
 type createAnswerSchemaType = z.infer<typeof createAnswerSchema>;
 type deleteAnswerSchemaType = z.infer<typeof deleteAnswerSchema>;
 type updateAnswerSchemaType = z.infer<typeof updateAnswerSchema>;
+type getSortedAnswersSchemaType = z.infer<typeof getSortedAnswersSchema>;
 
 export {
     getDiscussionSchema,
@@ -69,6 +79,7 @@ export {
     createAnswerSchema,
     deleteAnswerSchema,
     updateAnswerSchema,
+    getSortedAnswersSchema,
 
     getDiscussionSchemaType,
     getDiscussionsByFilterSchemaType,
@@ -78,4 +89,6 @@ export {
     createAnswerSchemaType,
     deleteAnswerSchemaType,
     updateAnswerSchemaType,
+    getSortedAnswersSchemaType,
+
 }
