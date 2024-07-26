@@ -52,6 +52,7 @@ const updateAnswerSchema = z.object({
 });
 
 const getSortedAnswersSchema = z.object({
+    discussionId: idSchema,
     order: z.object({
         createdAt: orderDirectionSchema.optional(),
         likesCount: orderDirectionSchema.optional()

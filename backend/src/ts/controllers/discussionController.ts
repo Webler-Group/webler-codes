@@ -175,6 +175,6 @@ export const updateAnswer = async (req: AuthRequest<updateAnswerSchemaType>, res
 }
 
 export const getSortedAnswers = async (req: AuthRequest<getSortedAnswersSchemaType>, res: Response) => {
-
+  getSortedAnswersSchema.parse(req.body);
   res.json({});
 }
