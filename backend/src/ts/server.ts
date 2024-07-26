@@ -9,26 +9,31 @@ import NotFoundException from './exceptions/NotFoundException';
 import { ErrorCode } from './exceptions/enums/ErrorCode';
 import { reportRouter } from './routes/reportRouter';
 import discussionRouter from './routes/discussionRouter';
+import { dindClient } from './services/dindClient';
 
-const app = express();
+const main = async () => {
+    const app = express();
 
-app.use(express.json({ limit: '2mb' }));
-app.use(cookieParser());
+    app.use(express.json({ limit: '2mb' }));
+    app.use(cookieParser());
 
-app.use(`${API_PREFIX}/auth`, authRouter);
-app.use(`${API_PREFIX}/user`, userRouter);
-app.use(`${API_PREFIX}/code`, codeRouter);
-app.use(`${API_PREFIX}/reports`, reportRouter);
-app.use(`${API_PREFIX}/discussion`, discussionRouter);
+    app.use(`${API_PREFIX}/auth`, authRouter);
+    app.use(`${API_PREFIX}/user`, userRouter);
+    app.use(`${API_PREFIX}/code`, codeRouter);
+    app.use(`${API_PREFIX}/reports`, reportRouter);
+    app.use(`${API_PREFIX}/discussion`, discussionRouter);
 
-app.get('*', (req, res, next) => {
-    next(new NotFoundException('Route does not exist', ErrorCode.ROUTE_NOT_FOUND));
-});
+    app.get('*', (req, res, next) => {
+        next(new NotFoundException('Route does not exist', ErrorCode.ROUTE_NOT_FOUND));
+    });
 
-app.use(errorMiddleware);
+    app.use(errorMiddleware);
 
-app.listen(BACKEND_PORT, () => {
-    console.log(`App listening on ${BACKEND_PORT}`);
-});
+    await dindClient.connect();
 
-export default app;
+    app.listen(BACKEND_PORT, () => {
+        console.log(`App listening on ${BACKEND_PORT}`);
+    });
+}
+
+main();
