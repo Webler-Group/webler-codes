@@ -225,10 +225,10 @@ model Post {
   isAccepted   Boolean?
   user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       BigInt
-  discussion   Discussion? @relation(fields: [discussionId], references: [id], onDelete: Cascade)
-  discussionId BigInt
-  code         Code?       @relation(fields: [codeId], references: [id], onDelete: Cascade)
-  codeId       BigInt
+  discussion   Discussion?   @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+  discussionId BigInt?   
+  code         Code?         @relation(fields: [codeId], references: [id], onDelete: Cascade)
+  codeId       BigInt?    
 }
 
 model Discussion {
