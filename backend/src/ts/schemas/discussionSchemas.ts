@@ -46,6 +46,10 @@ const deleteAnswerSchema = z.object({
   answerId: idSchema,
 });
 
+const updateAnswerSchema = z.object({
+    answerId: idSchema,
+    text: z.string().optional(),
+});
 
 type deleteDiscussionSchemaType = z.infer<typeof deleteDiscussionSchema>;
 type getDiscussionSchemaType = z.infer<typeof getDiscussionSchema>;
@@ -54,6 +58,7 @@ type createDiscussionSchemaType = z.infer<typeof createDiscussionSchema>;
 type getDiscussionsByFilterSchemaType = z.infer<typeof getDiscussionsByFilterSchema>;
 type createAnswerSchemaType = z.infer<typeof createAnswerSchema>;
 type deleteAnswerSchemaType = z.infer<typeof deleteAnswerSchema>;
+type updateAnswerSchemaType = z.infer<typeof updateAnswerSchema>;
 
 export {
     getDiscussionSchema,
@@ -63,6 +68,7 @@ export {
     createDiscussionSchema,
     createAnswerSchema,
     deleteAnswerSchema,
+    updateAnswerSchema,
 
     getDiscussionSchemaType,
     getDiscussionsByFilterSchemaType,
@@ -71,4 +77,5 @@ export {
     createDiscussionSchemaType,
     createAnswerSchemaType,
     deleteAnswerSchemaType,
+    updateAnswerSchemaType,
 }

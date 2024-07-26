@@ -2,8 +2,8 @@ import { Response } from "express";
 import { prisma } from "../services/database";
 import { createDiscussionSchema , deleteDiscussionSchema , updateDiscussionSchema , getDiscussionSchema , getDiscussionsByFilterSchema } from "../schemas/discussionSchemas";
 import { createDiscussionSchemaType, deleteDiscussionSchemaType, updateDiscussionSchemaType, getDiscussionSchemaType, getDiscussionsByFilterSchemaType } from "../schemas/discussionSchemas";
-import { createAnswerSchema, deleteAnswerSchema } from "../schemas/discussionSchemas";
-import { createAnswerSchemaType, deleteAnswerSchemaType } from "../schemas/discussionSchemas";
+import { createAnswerSchema, deleteAnswerSchema, updateAnswerSchema } from "../schemas/discussionSchemas";
+import { createAnswerSchemaType, deleteAnswerSchemaType, updateAnswerSchemaType } from "../schemas/discussionSchemas";
 import { AuthRequest } from "../middleware/authMiddleware";
 import { defaultDiscussionSelect, findDiscussionOrThrow, defaultAnswerSelect, findAnswerOrThrow } from "../helpers/discussionHelper";
 import { bigintToNumber } from "../utils/utils";
@@ -152,6 +152,24 @@ export const deleteAnswer = async (req: AuthRequest<deleteAnswerSchemaType>, res
   deleteAnswerSchema.parse(req.body);
   const { answerId } = req.body;
   const answer = await findAnswerOrThrow( {id: answerId, postType: PostType.ANSWER} );
+  if(answer.userId != req.user!.id) {
+    throw new ForbiddenException("Forbidden", ErrorCode.FORBIDDEN);
+  }
   await prisma.post.delete({where: {id: answer.id}});
-  res.json({});
+  res.json({success: true});
+}
+
+export const updateAnswer = async (req: AuthRequest<updateAnswerSchemaType>, res: Response) => {
+  updateAnswerSchema.parse(req.body);
+  const { answerId, text } = req.body;
+  let answer = await findAnswerOrThrow( {id: answerId, postType: PostType.ANSWER} );
+  if(answer.userId != req.user!.id) {
+    throw new ForbiddenException("Forbidden", ErrorCode.FORBIDDEN);
+  }
+  answer = await prisma.post.update({
+    where: {id: answer.id},
+    data: {text},
+    select: defaultAnswerSelect
+  });
+  res.json({success:true, data: bigintToNumber(answer)});
 }
