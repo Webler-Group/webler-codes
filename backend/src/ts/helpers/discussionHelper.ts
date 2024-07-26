@@ -43,3 +43,20 @@ export const findDiscussionOrThrow = async (
   }
   return discussion;
 }
+
+export const findAnswerOrThrow = async (
+  where: Prisma.PostWhereInput,
+  select: Prisma.PostSelect = {}
+) => {
+  const answer = await prisma.post.findFirst({ 
+    where,
+    select: {
+      ...select,
+      ...defaultAnswerSelect
+    }
+  });
+  if (!answer) {
+    throw new NotFoundException('Answer not found', ErrorCode.CODE_NOT_FOUND);
+  }
+  return answer;
+}
