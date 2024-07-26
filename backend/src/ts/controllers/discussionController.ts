@@ -52,7 +52,7 @@ export const deleteDiscussion = async (req: AuthRequest<deleteDiscussionSchemaTy
 
   let discussion = await findDiscussionOrThrow({ id: discussionId }, { id: true, userId: true });
 
-  if(!currentUser.roles.includes(Role.ADMIN) && discussion.userId != currentUser.id) {
+  if(!currentUser.roles.includes(Role.ADMIN) && discussion.user.id != currentUser.id) {
     throw new ForbiddenException("Forbidden", ErrorCode.FORBIDDEN);
   }
 
@@ -73,7 +73,7 @@ export const updateDiscussion = async (req: AuthRequest<updateDiscussionSchemaTy
 
   let discussion = await findDiscussionOrThrow({ id: discussionId }, { id: true, userId: true });
 
-  if(discussion.userId != currentUser.id) {
+  if(discussion.user.id != currentUser.id) {
     throw new ForbiddenException("Forbidden", ErrorCode.FORBIDDEN);
   }
 
@@ -152,7 +152,8 @@ export const deleteAnswer = async (req: AuthRequest<deleteAnswerSchemaType>, res
   deleteAnswerSchema.parse(req.body);
   const { answerId } = req.body;
   const answer = await findAnswerOrThrow( {id: answerId, postType: PostType.ANSWER} );
-  if(answer.userId != req.user!.id) {
+  const currentUser = req.user!;
+  if(!currentUser.roles.includes(Role.ADMIN) && answer.user.id != currentUser.id) {
     throw new ForbiddenException("Forbidden", ErrorCode.FORBIDDEN);
   }
   await prisma.post.delete({where: {id: answer.id}});
@@ -163,7 +164,8 @@ export const updateAnswer = async (req: AuthRequest<updateAnswerSchemaType>, res
   updateAnswerSchema.parse(req.body);
   const { answerId, text } = req.body;
   let answer = await findAnswerOrThrow( {id: answerId, postType: PostType.ANSWER} );
-  if(answer.userId != req.user!.id) {
+  const currentUser = req.user!;
+  if(!currentUser.roles.includes(Role.ADMIN) && answer.user.id != currentUser.id) {
     throw new ForbiddenException("Forbidden", ErrorCode.FORBIDDEN);
   }
   answer = await prisma.post.update({
