@@ -5,11 +5,11 @@ import { createDiscussionSchemaType, deleteDiscussionSchemaType, updateDiscussio
 import { createAnswerSchema } from "../schemas/discussionSchemas";
 import { createAnswerSchemaType } from "../schemas/discussionSchemas";
 import { AuthRequest } from "../middleware/authMiddleware";
-import { defaultDiscussionSelect, findDiscussionOrThrow } from "../helpers/discussionHelper";
+import { defaultDiscussionSelect, findDiscussionOrThrow, defaultAnswerSelect } from "../helpers/discussionHelper";
 import { bigintToNumber } from "../utils/utils";
 import ForbiddenException from "../exceptions/ForbiddenException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
-import { Role } from "@prisma/client";
+import { Role, PostType } from "@prisma/client";
 
 /**
  * Creates a Discussion
@@ -132,5 +132,18 @@ export const getDiscussionsByFilter = async (req: AuthRequest<getDiscussionsByFi
 }
 
 export const createAnswer = async (req: AuthRequest<createAnswerSchemaType>, res: Response) => {
-
+  createAnswerSchema.parse(req.body);
+  const { text, discussionId } = req.body;
+  const discussion = await findDiscussionOrThrow({ id: discussionId });
+  const answer = await prisma.post.create({
+    data: {
+      text,
+      postType: PostType.ANSWER,
+      userId: req.user!.id,
+      discussionId,
+      isAccepted: false
+    },
+    select: defaultAnswerSelect
+  });
+  res.json({success:true, data:bigintToNumber(answer)});
 }

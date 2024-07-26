@@ -16,6 +16,17 @@ export const defaultDiscussionSelect: Prisma.DiscussionSelect = {
   }
 };
 
+export const defaultAnswerSelect: Prisma.PostSelect = {
+  id: true,
+  text: true,
+  createdAt: true,
+  updatedAt: true,
+  isAccepted: true,
+  user: {
+    select: defaultUserSelect
+  }
+};
+
 export const findDiscussionOrThrow = async (
   where: Prisma.DiscussionWhereInput,
   select: Prisma.DiscussionSelect = {}
