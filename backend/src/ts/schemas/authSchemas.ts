@@ -7,10 +7,22 @@ const registerSchema = z.object({
     password: passwordSchema
 });
 
-const loginSchema = z.object({
+// Base schema for login
+const baseLoginSchema = z.object({
+    password: passwordSchema,
+})
+
+const usernameLoginSchema = baseLoginSchema.extend({
+    username: usernameSchema,
+    email: z.undefined()
+})
+
+const emailLoginSchema = baseLoginSchema.extend({
     email: emailSchema,
-    password: passwordSchema
+    username: z.undefined()
 });
+
+const loginSchema = z.union([usernameLoginSchema, emailLoginSchema]);
 
 const resendEmailVerificationCodeSchema = z.object({
     email: emailSchema
