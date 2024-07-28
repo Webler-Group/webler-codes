@@ -5,15 +5,17 @@
   "main": "server.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/ts/server.js",
-    "dev": "nodemon src/ts/server.ts",
+    "start": "node dist/ts/src/server.js",
+    "dev": "nodemon ts/src/server.ts",
     "test": "jest"
   },
   "prisma": {
-    "seed": "ts-node src/ts/cli/seed.ts"
+    "seed": "ts-node ts/src/cli/seed.ts"
   },
   "nodemonConfig": {
-    "ignore": ["**/test/**"]
+    "ignore": [
+      "**/test/**"
+    ]
   },
   "keywords": [],
   "author": "",
@@ -34,7 +36,8 @@
     "supertest": "^7.0.0",
     "ts-jest": "^29.2.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "yarg": "^1.0.8"
   },
   "dependencies": {
     "@prisma/client": "^5.17.0",

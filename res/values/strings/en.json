@@ -1,0 +1,16 @@
+{
+  "appname": "Webler",
+  "email_subject_prefix": "Webler Codes Team",
+
+  "username_is_used": "Username is currently not available",
+  "email_is_used": "Email has been linked to another account",
+  "verify_your_account_msg": "Please check your email to confirm your account",
+  "incorrect_password": "Incorrect password",
+  "user_is_verified": "User is already verified",
+  "verification_code_not_found": "Verification code not found",
+  "verification_code_expired": "Verification code expired",
+  "refresh_token_not_set": "Refresh token is not set",
+  "refresh_token_invalid": "Invalid refresh token",
+
+  "_last_append": "insert before this"
+}

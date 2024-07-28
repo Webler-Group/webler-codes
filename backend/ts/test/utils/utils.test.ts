@@ -1,10 +1,10 @@
-import {generateRandomFileName, bigintToNumber } from '../../ts/utils/utils';
+import R from '../../src/utils/resourceManager';
+import {generateRandomFileName, bigintToNumber } from '../../src/utils/utils';
 
 describe('Utils', () => {
-    describe("get string resources", () => {
+    describe("get string res", () => {
         it("Ensure strings are retrived from locale=en", async() => {
-            // always fail.. untill after implementation
-            expect(true).toBe(false);
+            expect(R.strings.appname).toBe("Webler");
         })
     })
 

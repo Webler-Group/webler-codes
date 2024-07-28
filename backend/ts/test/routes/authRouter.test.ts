@@ -1,9 +1,9 @@
 import request from 'supertest';
 import * as bcrypt from "bcryptjs";
-import app from '../../ts/server';
+import app from '../../src/server';
 import {setupTestDatabase, teardownTestDatabase} from '../setup';
-import {prisma} from "../../ts/services/database";
-import {bigintToNumber} from "../../ts/utils/utils";
+import {prisma} from "../../src/services/database";
+import {bigintToNumber} from "../../src/utils/utils";
 import {Role} from "@prisma/client";
 
 

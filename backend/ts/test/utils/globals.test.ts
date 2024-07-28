@@ -12,7 +12,7 @@ import {
     LOG_DIR,
     ADMIN_EMAIL,
     ADMIN_PASSWORD
-} from '../../ts/utils/globals';
+} from '../../src/utils/globals';
 
 describe('Globals', () => {
     it('should have NODE_ENV set', () => {

@@ -1,6 +1,6 @@
 import {Prisma, Role} from '@prisma/client';
 import * as bcrypt from "bcryptjs";
-import {prisma} from "../ts/services/database";
+import {prisma} from "../src/services/database";
 
 // environment variable setup, this is to eradicate the use of .env.test file
 // literally anything here can be changed well except the DATABASE_URL ofcourse
