@@ -1,23 +1,68 @@
 import { execSync } from 'child_process';
+import R from '../utils/resourceManager';
+
+export const launchShellWithOption_1 = (args: any) => {
+    const options = {
+        "docker-backend": {
+            desc: "Launching shell in docker backend",
+            cmd: "docker exec -it webler-codes-backend sh"
+        },
+        "node": {
+            desc: "opening node shell",
+            cmd: "node"
+        }
+    };
+    execOptional_1(args, options);
+}
 
 
-export const openCmdInBackendDockerContainer = (): void => execCmd("Opening command line in backend container",
-    "docker exec -it webler-codes-backend sh");
+export const launchWithOption_1 = (args: any) => {
+    const options = {
+        "docker": {
+            desc: "Launching docker",
+            cmd: "docker stop $(docker ps -q); docker compose -f ../docker-compose-dev.yaml up"
+        },
+        "server": {
+            desc: "Launching server",
+            cmd: "node dist/ts/src/server.js"
+        },
+        "devserver": {
+            desc: "Launching devserver",
+            cmd: "nodemon ts/src/server.ts"
+        }
+    };
+    execOptional_1(args, options);
+}
 
-export const buildDocker = (): void => execCmd("Rebuilding Docker",
-    "docker stop $(docker ps -q); docker compose -f docker-compose-dev.yaml up --build --force-recreate");
 
-export const launchDocker = (): void => execCmd("Launching Docker", "docker stop $(docker ps -q); " +
-    "docker compose -f docker-compose-dev.yaml up");
 
-export const seedDatabase = (): void => execCmd("Seeding Database", "src-node src/src/cli/seed.src");
+export const buildWithOption_1 = (args: any) => {
+    const options: {[key: string]: {
+        desc: string,
+        cmd: string,
+    }} = {
+        "typescript": {
+            desc: "Building Typescript",
+            cmd: "ts-node ./ts/src/cli/RCompiler.ts && tsc"
+        },
+        "docker": {
+            desc: "Building docker",
+            cmd: "docker stop $(docker ps -q); docker compose -f ../docker-compose-dev.yaml up --build --force-recreate"
+        }
+    };
+    execOptional_1(args, options);
+}
 
-export const buildTypescript = (): void => execCmd("Building typsecript", "tsc");
 
-export const startServer = (): void => execCmd("Starting server...", "node dist/src/server.js");
-
-export const devStartServer = (): void => execCmd("Starting dev server...", "nodemon src/src/server.src");
-
+function execOptional_1(args: any, options: {[key: string]: {desc: string, cmd: string }}) {
+    const testWhat = args.what || '';
+    if (!(options.hasOwnProperty(testWhat))) {
+        console.log(R.strings.invalid_cmd_option);
+        for(const option in options) console.log(option);
+        return;
+    }
+    execCmd(options[testWhat].desc, options[testWhat].cmd);
+}
 
 /**
  * This function executes command line's command
