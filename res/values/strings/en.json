@@ -12,5 +12,12 @@
   "refresh_token_not_set": "Refresh token is not set",
   "refresh_token_invalid": "Invalid refresh token",
 
+
+
+  "invalid_cmd_option": "COMMAND_LINE_unexpected| Option must be selected from the listed below",
+
+
+
+
   "_last_append": "insert before this"
 }

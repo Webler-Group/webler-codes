@@ -1,4 +1,4 @@
-//Compiled on Sun Jul 28 2024 01:31:25 GMT-0400 (Eastern Daylight Time)
+//Compiled on Sun Jul 28 2024 21:09:35 GMT-0400 (Eastern Daylight Time)
 
 interface iStringResource {
     appname: string,
@@ -12,6 +12,7 @@ interface iStringResource {
     verification_code_expired: string,
     refresh_token_not_set: string,
     refresh_token_invalid: string,
+    invalid_cmd_option: string,
     _last_append: string,
 }
 
@@ -36,6 +37,7 @@ const R: iR = {
     verification_code_expired:  "Verification code expired",
     refresh_token_not_set:  "Refresh token is not set",
     refresh_token_invalid:  "Invalid refresh token",
+    invalid_cmd_option:  "COMMAND_LINE_unexpected| Option must be selected from the listed below",
     _last_append:  "insert before this"
  },
     },

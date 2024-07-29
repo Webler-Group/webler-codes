@@ -29,7 +29,6 @@ process.env.ADMIN_PASSWORD = "testAdminPassword";
  *      SQL (`TRUNCATE TABLE users CASCADE`)
  * then inserting the users as mentioned, respectively.
  */
-// TRUNCATE TABLE "User" RESTART IDENTITY CASCADE;
 const seedTestDatabase = async (): Promise<void> => {
     await prisma.$executeRaw`TRUNCATE TABLE "User" CASCADE;`;
 

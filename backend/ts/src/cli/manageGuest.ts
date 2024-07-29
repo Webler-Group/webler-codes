@@ -1,6 +1,28 @@
 import { execSync } from 'child_process';
 import R from '../utils/resourceManager';
 
+export const testWithDescription = (args: any) => {
+    const testWhat = args.description || '';
+    execCmd("Running test for: " + testWhat, `npx jest -t ${testWhat}`);
+}
+
+export const testWithOption_1 = (args: any) => {
+    const testWhat = args.directory || '';
+    if(testWhat === '') {
+        execCmd("Running all tests", "npx jest");
+        return;
+    }
+    const isWholeDirectory = testWhat.indexOf(".") < 0;
+    if(isWholeDirectory) {
+        execCmd("Running all tests in the directory: " + testWhat, `npx jest /ts/test/${testWhat}`);
+        return;
+    }
+
+    const [dir, file] = testWhat.split(".");
+    execCmd("Running test for: " + file, `npx jest /ts/test/${dir}/${file}.test.ts`);
+    
+}
+
 export const launchShellWithOption_1 = (args: any) => {
     const options = {
         "docker-backend": {

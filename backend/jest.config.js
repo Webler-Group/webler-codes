@@ -2,18 +2,16 @@ module.exports = {
     preset: 'ts-jest',
     testEnvironment: 'node',
     clearMocks: true,
-    roots: ['./src/test'],
-    testMatch: ['**/*.test.src'],
+    roots: ['./ts/test'],
+    testMatch: ['**/*.test.ts'],
     moduleFileExtensions: ['ts', 'js', 'json', 'node'],
-    setupFiles: ['./src/test/setup.src'],
+    setupFiles: ['./ts/test/setup.ts'],
     coverageDirectory: './coverage',
     collectCoverageFrom: [
-        'src/src/**/*.{src,js}',
-        '!src/src/**/*.d.src',
-        '!src/src/**/server.src', // exclude server files
-        '!src/src/**/migrations/**/*', // exclude migration files
-        '!src/src/**/seed.src', // exclude seed files
-        '!src/src/**/codeTemplateSeed.src', // exclude code-seed files
+        'ts/src/**/*.{src,js}',
+        '!ts/src/**/server.ts', // exclude server files
+        '!ts/src/**/seed.ts', // exclude seed files
+        '!ts/src/**/codeTemplateSeed.ts', // exclude code-seed files
     ],
     testPathIgnorePatterns: ['/node_modules/', '/dist/'],
     testTimeout: 30000

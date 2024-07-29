@@ -5,6 +5,7 @@ import {setupTestDatabase, teardownTestDatabase} from '../setup';
 import {prisma} from "../../src/services/database";
 import {bigintToNumber} from "../../src/utils/utils";
 import {Role} from "@prisma/client";
+import R from '../../src/utils/resourceManager';
 
 
 describe('Auth Router', () => {
@@ -71,12 +72,12 @@ describe('Auth Router', () => {
         it('should throw an error if password is incorrect', async () => {
             // Seed database with a user
             await prisma.user.create({
-                data: { username: 'testuser', email: 'test@example.com', password: 'hashedPassword', roles: ['USER'] }
+                data: { username: 'testuser_', email: 'test_@example.com', password: 'hashedPassword', roles: ['USER'] }
             });
 
             const res = await request(app)
                 .post('/api/auth/login')
-                .send({ email: 'test@example.com', password: 'wrongpassword' });
+                .send({ email: 'test_@example.com', password: 'wrongpassword' });
 
             expect(res.status).toBe(400);
             expect(res.body.message).toBe('Password is incorrect');
@@ -85,12 +86,12 @@ describe('Auth Router', () => {
         it('should throw an error if user is not verified', async () => {
             // Seed database with a user
             await prisma.user.create({
-                data: { username: 'testuser', email: 'test@example.com', password: 'hashedPassword', roles: ['USER'], isVerified: false }
+                data: { username: 'testuser1000', email: 'test_1000@example.com', password: 'hashedPassword', roles: ['USER'], isVerified: false }
             });
 
             const res = await request(app)
                 .post('/api/auth/login')
-                .send({ email: 'test@example.com', password: 'password' });
+                .send({ email: 'test_1000@example.com', password: 'password' });
 
             expect(res.status).toBe(403);
             expect(res.body.message).toBe('User is not verified');
@@ -129,12 +130,12 @@ describe('Auth Router', () => {
 
         it('should throw an error if username is already in use', async () => {
             await prisma.user.create({
-                data: { username: 'testuser', email: 'other@example.com', password: 'hashedPassword', roles: ['USER'] }
+                data: { username: 'testuser567', email: 'other@example.com', password: 'hashedPassword', roles: ['USER'] }
             });
 
             const res = await request(app)
                 .post('/api/auth/register')
-                .send({ username: 'testuser', email: 'new@example.com', password: 'password' });
+                .send({ username: 'testuser567', email: 'new@example.com', password: 'password' });
 
             expect(res.status).toBe(400);
             expect(res.body.message).toBe('Username is currently not available');
@@ -151,7 +152,7 @@ describe('Auth Router', () => {
                 .send({ username: 'newuser', email: 'test@example.com', password: 'password' });
 
             expect(res.status).toBe(400);
-            expect(res.body.message).toBe('This email has been linked with another account');
+            expect(res.body.message).toBe(R.strings.email_is_used);
         });
     });
 
