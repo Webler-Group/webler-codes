@@ -1,5 +1,5 @@
 import express from 'express';
-import { API_PREFIX, BACKEND_PORT } from './utils/globals';
+import { API_PREFIX, BACKEND_PORT, DOCKER_PASSWORD, DOCKER_USER } from './utils/globals';
 import authRouter from './routes/authRouter';
 import { errorMiddleware } from './middleware/errorMiddleware';
 import cookieParser from 'cookie-parser';
@@ -30,10 +30,13 @@ const main = async () => {
     app.use(errorMiddleware);
 
     await dindClient.connect();
+    await dindClient.dockerLogin(DOCKER_USER, DOCKER_PASSWORD);
 
     app.listen(BACKEND_PORT, () => {
         console.log(`App listening on ${BACKEND_PORT}`);
     });
+
+    await dindClient.disconnect();
 }
 
 main();

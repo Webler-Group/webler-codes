@@ -21,3 +21,6 @@ export const LOG_DIR = 'logs';
 
 export const ADMIN_EMAIL = process.env.ADMIN_EMAIL as string;
 export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD as string;
+
+export const DOCKER_USER = process.env.DOCKER_USER as string;
+export const DOCKER_PASSWORD = process.env.DOCKER_PASSWORD as string;
