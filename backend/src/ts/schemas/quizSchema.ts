@@ -12,6 +12,20 @@ const updateQuizSchema = z.object({
   tags: z.string().array(),
 });
 
+const deleteQuizSchema = z.object({
+  quizId: idSchema,
+});
+
+
+
 type createQuizSchemaType = z.infer<typeof createQuizSchema>;
 type updateQuizSchemaType = z.infer<typeof updateQuizSchema>;
-export { createQuizSchema, createQuizSchemaType, updateQuizSchema, updateQuizSchemaType };
+type deleteQuizSchemaType = z.infer<typeof deleteQuizSchema>;
+export {
+  createQuizSchema,
+  createQuizSchemaType,
+  updateQuizSchema,
+  updateQuizSchemaType,
+  deleteQuizSchema,
+  deleteQuizSchemaType,
+};

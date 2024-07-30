@@ -10,6 +10,7 @@ export const enum ErrorCode {
     VERIFICATION_CODE_EXPIRED = 1012,
 
     CODE_NOT_FOUND = 1021,
+    QUIZ_NOT_FOUND = 1021,
 
     PROFILE_NOT_FOUND = 1021,
     REPORT_NOT_FOUND = 1030,
