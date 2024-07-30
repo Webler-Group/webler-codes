@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getTemplate , createCode , deleteCode , getCode , updateCode , getCodesByFilter } from "../controllers/codeController";
+import { getTemplate , createCode , deleteCode , getCode , updateCode , getCodesByFilter, createCodeEvaluationTask } from "../controllers/codeController";
 import { authMiddleware } from "../middleware/authMiddleware";
 import { Role } from "@prisma/client";
 import { errorHandler } from "../middleware/errorMiddleware";
@@ -12,5 +12,6 @@ codeRouter.post('/deleteCode', [authMiddleware.bind(null, Role.USER)], errorHand
 codeRouter.post('/getCode', [authMiddleware.bind(null, Role.USER)], errorHandler(getCode));
 codeRouter.post('/updateCode', [authMiddleware.bind(null, Role.USER)], errorHandler(updateCode));
 codeRouter.post('/getCodesByFilter', [authMiddleware.bind(null, Role.USER)], errorHandler(getCodesByFilter));
+codeRouter.post('/createCodeEvaluationTask', [], errorHandler(createCodeEvaluationTask));
 
 export default codeRouter;

@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import { prisma } from "../services/database";
 import { getTemplateSchema , createCodeSchema , deleteCodeSchema , updateCodeSchema , getCodeSchema , getCodesByFilterSchema, createCodeSchemaType, getTemplateSchemaType, deleteCodeSchemaType, updateCodeSchemaType, getCodeSchemaType, getCodesByFilterSchemaType } from "../schemas/codeSchemas";
 import { AuthRequest } from "../middleware/authMiddleware";
@@ -6,7 +6,8 @@ import { defaultCodeSelect, findCodeOrThrow } from "../helpers/codeHelper";
 import { bigintToNumber } from "../utils/utils";
 import ForbiddenException from "../exceptions/ForbiddenException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
-import { Role } from "@prisma/client";
+import { CodeLanguage, Role } from "@prisma/client";
+import { dindClient } from "../services/dindClient";
 
 /**
  * Get code template
@@ -156,4 +157,12 @@ export const getCodesByFilter = async (req: AuthRequest<getCodesByFilterSchemaTy
     });
 
     res.json(codes.map(x => bigintToNumber(x)));
+}
+
+export const createCodeEvaluationTask = async (req: Request, res: Response) => {
+    const { source, input } = req.body;
+
+    const result = await dindClient.evaluateCode(CodeLanguage.C, source, input);
+
+    res.json(result);
 }
