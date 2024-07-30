@@ -8,6 +8,8 @@ import {
   deleteQuizSchemaType,
   getQuizSchema,
   getQuizSchemaType,
+  requestQuizDraftApprovalSchema,
+  requestQuizDraftApprovalSchemaType,
   updateQuizSchema,
   updateQuizSchemaType,
 } from "../schemas/quizSchema";
@@ -143,4 +145,27 @@ const getQuiz = async (req: AuthRequest<getQuizSchemaType>, res: Response) => {
   });
 };
 
-export { createQuiz, updateQuiz, deleteQuiz, getQuiz };
+const requestQuizDraftApproval = async (req: AuthRequest<requestQuizDraftApprovalSchemaType>, res: Response) => {
+  requestQuizDraftApprovalSchema.parse(req.body);
+
+  const { quizId } = req.body;
+
+  const Quiz = await prisma.quiz.update({
+    where: {
+      id: quizId,
+    },
+    data: {
+      status: QuizStatus.WAITING_FOR_APPROVAL,
+    },
+  });
+
+  if (!(Quiz.authorId == req.user?.id)) {
+    throw new ForbiddenException("access is forbidden", ErrorCode.FORBIDDEN);
+  }
+
+  res.json({
+    success: true,
+  });
+};
+
+export { createQuiz, updateQuiz, deleteQuiz, getQuiz, requestQuizDraftApproval };
