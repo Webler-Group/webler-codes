@@ -27,12 +27,16 @@ const dindClient = (function() {
 
     const evaluateCode = async (lang: CodeLanguage, source: string, input: string) => {
         console.log(`Connected: ${ssh.isConnected()}`);
+        const compilers=new Map();
+        compilers.set(CodeLanguage.C, "clang");
+        compilers.set(CodeLanguage.CPP, "clang-cpp");
+        compilers.set(CodeLanguage.LISP, "clojure");
         if(!ssh.isConnected()) {
             await connect();
             await dockerLogin(DOCKER_USER, DOCKER_PASSWORD);
         }
         try {
-            const result = await ssh.exec(`docker run --rm ghcr.io/webler-group/clang`, [source, input]);
+            const result = await ssh.exec(`docker run --rm ghcr.io/webler-group/${compilers.get(lang)}`, [source, input]);
             return { stdout: result ?? "No output" };
         } catch(error: any) {
             return { stderr: error.message }

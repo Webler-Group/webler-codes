@@ -160,9 +160,9 @@ export const getCodesByFilter = async (req: AuthRequest<getCodesByFilterSchemaTy
 }
 
 export const createCodeEvaluationTask = async (req: Request, res: Response) => {
-    const { source, input } = req.body;
+    const { source, input, language } = req.body;
 
-    const result = await dindClient.evaluateCode(CodeLanguage.C, source, input);
+    const result = await dindClient.evaluateCode(language, source, input);
 
     res.json(result);
 }
