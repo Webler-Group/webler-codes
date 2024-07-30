@@ -6,6 +6,8 @@ import {
   createQuizSchemaType,
   deleteQuizSchema,
   deleteQuizSchemaType,
+  getQuizSchema,
+  getQuizSchemaType,
   updateQuizSchema,
   updateQuizSchemaType,
 } from "../schemas/quizSchema";
@@ -14,7 +16,7 @@ import { Role } from "@prisma/client";
 import { bigintToNumber } from "../utils/utils";
 import ForbiddenException from "../exceptions/ForbiddenException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
-import { defaultQuizSelect } from "../helpers/quizHelper";
+import { defaultQuizQuestionSelect, defaultQuizSelect } from "../helpers/quizHelper";
 import NotFoundException from "../exceptions/NotFoundException";
 
 const createQuiz = async (req: AuthRequest<createQuizSchemaType>, res: Response) => {
@@ -61,8 +63,8 @@ const updateQuiz = async (req: AuthRequest<updateQuizSchemaType>, res: Response)
     if (!(getQuiz?.authorId == req.user?.id) || !req.user?.roles.includes(Role.MODERATOR)) {
       throw new ForbiddenException("access is forbidden", ErrorCode.FORBIDDEN);
     }
-  }else{
-    throw new NotFoundException("quiz not found", ErrorCode.QUIZ_NOT_FOUND)
+  } else {
+    throw new NotFoundException("quiz not found", ErrorCode.QUIZ_NOT_FOUND);
   }
   const Quiz = await prisma.quiz.update({
     where: {
@@ -91,8 +93,19 @@ const deleteQuiz = async (req: AuthRequest<deleteQuizSchemaType>, res: Response)
   deleteQuizSchema.parse(req.body);
 
   const { quizId } = req.body;
+  const Quiz = await prisma.quiz.findUnique({
+    select: defaultQuizSelect,
+    where: {
+      id: quizId,
+    },
+  });
+
+  if (!Quiz) {
+    throw new NotFoundException("quiz not found", ErrorCode.QUIZ_NOT_FOUND);
+  }
 
   await prisma.quiz.delete({
+    select: defaultQuizSelect,
     where: {
       id: quizId,
     },
@@ -103,5 +116,31 @@ const deleteQuiz = async (req: AuthRequest<deleteQuizSchemaType>, res: Response)
   });
 };
 
+const getQuiz = async (req: AuthRequest<getQuizSchemaType>, res: Response) => {
+  getQuizSchema.parse(req.body);
+  const { quizId } = req.body;
 
-export { createQuiz, updateQuiz, deleteQuiz };
+  const Quiz = await prisma.quiz.findUnique({
+    select: defaultQuizSelect,
+    where: {
+      id: quizId,
+    },
+  });
+
+  if (Quiz) {
+    if (!(Quiz.authorId == req.user?.id) || !req.user?.roles.includes(Role.MODERATOR)) {
+      throw new ForbiddenException("access is forbidden", ErrorCode.FORBIDDEN);
+    }
+  } else {
+    throw new NotFoundException("quiz not found", ErrorCode.QUIZ_NOT_FOUND);
+  }
+
+  res.json({
+    data: bigintToNumber(Quiz),
+    questions: {
+      select: defaultQuizQuestionSelect,
+    },
+  });
+};
+
+export { createQuiz, updateQuiz, deleteQuiz, getQuiz };

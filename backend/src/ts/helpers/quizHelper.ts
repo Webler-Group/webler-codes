@@ -15,3 +15,14 @@ export const defaultQuizSelect: Prisma.QuizSelect = {
   questions: true,
   quizPorgress: true,
 };
+
+export const defaultQuizQuestionSelect: Prisma.QuizQuestionSelect = {
+  id: true,
+  quiz: true,
+  quizId: true,
+  type: true,
+  correctAnswer: true,
+  text: true,
+  options: true,
+  questionResults: true,
+};
