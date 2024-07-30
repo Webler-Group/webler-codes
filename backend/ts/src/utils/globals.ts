@@ -1,4 +1,5 @@
 import { configDotenv } from 'dotenv';
+import * as path from "path";
 
 configDotenv();
 
@@ -21,3 +22,8 @@ export const LOG_DIR = 'logs';
 
 export const ADMIN_EMAIL = process.env.ADMIN_EMAIL as string;
 export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD as string;
+
+// These path assumes that command are run from the directory that contain the webler.ts file
+// You have to be careful when using this path outside the webler.ts file
+export const BASE_DIR = path.resolve("../");
+export const BACKEND_DIR = path.join(BASE_DIR, "backend");

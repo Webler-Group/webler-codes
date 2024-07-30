@@ -6,8 +6,8 @@ import {
     setRefreshTokenCookie,
     clearRefreshTokenCookie,
     TokenPayload
-} from '../../ts/utils/tokenUtils';
-import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '../../ts/utils/globals';
+} from '../../src/utils/tokenUtils';
+import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '../../src/utils/globals';
 
 describe('Token Utilities', () => {
     const mockUserId = BigInt(1);

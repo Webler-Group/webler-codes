@@ -1,0 +1,1 @@
+type undefined_t<T> = T | undefined;

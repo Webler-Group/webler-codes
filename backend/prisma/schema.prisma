@@ -13,6 +13,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Locale {
+  EN
+}
+
 model User {
   id               BigInt            @id @default(autoincrement())
   username         String            @unique @db.VarChar(64)
@@ -42,6 +46,7 @@ model User {
   posts            Post[]
   discussions      Discussion[]
   feeds            Feed[]
+  locale           Locale            @default(EN)
 }
 
 model Profile {
@@ -92,12 +97,11 @@ model SocialAccount {
 }
 
 model UserFollows {
-  createdAt DateTime @default(now())
-  follower    User   @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  follower    User     @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
   followerId  BigInt
-  following   User   @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+  following   User     @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
   followingId BigInt
-  
 
   @@id([followerId, followingId])
 }
@@ -118,7 +122,7 @@ model Report {
   parent         Report?      @relation("reportRelates", fields: [parentId], references: [id], onDelete: SetNull)
   parentId       BigInt?
   children       Report[]     @relation("reportRelates")
-  author         User?         @relation("authoredReports", fields: [authorId], references: [id], onDelete: SetNull)
+  author         User?        @relation("authoredReports", fields: [authorId], references: [id], onDelete: SetNull)
   authorId       BigInt?
   reportedUser   User         @relation("reported", fields: [reportedUserId], references: [id], onDelete: Cascade)
   reportedUserId BigInt
@@ -127,7 +131,7 @@ model Report {
   reason         ReportReason
   assignee       User?        @relation("assignedReports", fields: [assigneeId], references: [id], onDelete: SetNull)
   assigneeId     BigInt?
-  bans            Ban[]
+  bans           Ban[]
   note           String?
 }
 
@@ -152,17 +156,17 @@ enum ReportReason {
 }
 
 model Ban {
-  id            BigInt       @id @default(autoincrement())
-  reason        ReportReason
-  banStart      DateTime     @default(now())
-  banEnd        DateTime
-  user          User         @relation("banned", fields: [userId], references: [id], onDelete: Cascade)
-  userId        BigInt
-  author        User?         @relation("authoredBans", fields: [authorId], references: [id], onDelete: SetNull)
-  authorId      BigInt?
-  relatedReport Report? @relation(fields: [relatedReportId], references: [id], onDelete: SetNull)
+  id              BigInt       @id @default(autoincrement())
+  reason          ReportReason
+  banStart        DateTime     @default(now())
+  banEnd          DateTime
+  user            User         @relation("banned", fields: [userId], references: [id], onDelete: Cascade)
+  userId          BigInt
+  author          User?        @relation("authoredBans", fields: [authorId], references: [id], onDelete: SetNull)
+  authorId        BigInt?
+  relatedReport   Report?      @relation(fields: [relatedReportId], references: [id], onDelete: SetNull)
   relatedReportId BigInt?
-  note          String?
+  note            String?
 }
 
 model Code {
@@ -205,49 +209,49 @@ model CodeTemplate {
 }
 
 model Tag {
-  name        String  @id @db.VarChar(64)
-  author      User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  authorId    BigInt?
-  codes       Code[]
-  discussion  Discussion[]
+  name       String       @id @db.VarChar(64)
+  author     User?        @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorId   BigInt?
+  codes      Code[]
+  discussion Discussion[]
 }
 
 model Post {
-  id           BigInt        @id @default(autoincrement())
-  createdAt    DateTime      @default(now())
-  text         String        @db.VarChar(256)
-  updatedAt    DateTime?     @updatedAt
+  id           BigInt      @id @default(autoincrement())
+  createdAt    DateTime    @default(now())
+  text         String      @db.VarChar(256)
+  updatedAt    DateTime?   @updatedAt
   postType     PostType
   isPinned     Boolean?
   isAccepted   Boolean?
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       BigInt
-  discussion   Discussion?   @relation(fields: [discussionId], references: [id], onDelete: Cascade)
-  discussionId BigInt?   
-  code         Code?         @relation(fields: [codeId], references: [id], onDelete: Cascade)
-  codeId       BigInt?    
+  discussion   Discussion? @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+  discussionId BigInt
+  code         Code?       @relation(fields: [codeId], references: [id], onDelete: Cascade)
+  codeId       BigInt
 }
 
 model Discussion {
-  id         BigInt        @id @default(autoincrement())
-  createdAt  DateTime      @default(now())
-  text       String        @db.VarChar(1024)
-  updatedAt  DateTime?     @updatedAt
-  title      String        @db.VarChar(256)
-  tags       Tag[]
-  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     BigInt
-  answers    Post[]
+  id        BigInt    @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  text      String    @db.VarChar(1024)
+  updatedAt DateTime? @updatedAt
+  title     String    @db.VarChar(256)
+  tags      Tag[]
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    BigInt
+  answers   Post[]
 }
 
 model Feed {
-  id         BigInt        @id @default(autoincrement())
-  createdAt  DateTime      @default(now())
-  text       String        @db.VarChar(256)
-  updatedAt  DateTime?     @updatedAt
-  isPinned   Boolean       @default(false)
-  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     BigInt  
+  id        BigInt    @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  text      String    @db.VarChar(256)
+  updatedAt DateTime? @updatedAt
+  isPinned  Boolean   @default(false)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    BigInt
 }
 
 enum PostType {
@@ -262,6 +266,3 @@ enum QuizStatus {
   WAITING_FOR_APPROVAL
   ASSIGNED
 }
-
-
-
