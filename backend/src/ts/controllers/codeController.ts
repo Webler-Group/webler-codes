@@ -9,6 +9,7 @@ import { ErrorCode } from "../exceptions/enums/ErrorCode";
 import { CodeLanguage, Role } from "@prisma/client";
 import { dindClient } from "../services/dindClient";
 import { mainQueue } from "../services/redis";
+import InternalException from "../exceptions/InternalException";
 
 /**
  * Get code template
@@ -164,11 +165,11 @@ export const createCodeEvaluationTask = async (req: Request, res: Response) => {
     const { language, source, input } = req.body;
 
     const runner = dindClient.getRunner(language);
-    if(!runner || !runner.ready) {
-        throw new Error();
+    if(!runner) {
+        throw new InternalException("Runner is not available", ErrorCode.INTERNAL_EXCEPTION, null);
     }
 
-    const result = await dindClient.evaluateCode(language, source, input, 5);
+    const result = await dindClient.evaluateCode(runner.image, source, input, 5);
 
     res.json(result);
 }

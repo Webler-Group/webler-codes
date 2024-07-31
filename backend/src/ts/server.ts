@@ -29,8 +29,7 @@ const main = async () => {
 
     app.use(errorMiddleware);
 
-    await dindClient.login(DOCKER_USER, DOCKER_PASSWORD);
-    await dindClient.updateImages();
+    await dindClient.pullImages();
 
     app.listen(BACKEND_PORT, () => {
         console.log(`App listening on ${BACKEND_PORT}`);
