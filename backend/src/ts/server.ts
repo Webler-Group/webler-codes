@@ -29,14 +29,14 @@ const main = async () => {
 
     app.use(errorMiddleware);
 
-    await dindClient.connect();
-    await dindClient.dockerLogin(DOCKER_USER, DOCKER_PASSWORD);
+    await dindClient.login(DOCKER_USER, DOCKER_PASSWORD);
+    await dindClient.updateImages();
 
     app.listen(BACKEND_PORT, () => {
         console.log(`App listening on ${BACKEND_PORT}`);
     });
 
-    await dindClient.disconnect();
+    dindClient.disconnect();
 }
 
 main();

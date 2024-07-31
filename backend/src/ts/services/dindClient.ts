@@ -1,9 +1,23 @@
 import { CodeLanguage } from "@prisma/client";
 import { NodeSSH } from "node-ssh";
-import { DOCKER_PASSWORD, DOCKER_USER } from "../utils/globals";
+
+const REGISTRY = "ghcr.io/webler-group/";
 
 const dindClient = (function() {
     const ssh = new NodeSSH();
+
+    const runners: { lang: CodeLanguage, image: string, ready: boolean }[] = [
+        {
+            lang: CodeLanguage.C,
+            image: "clang",
+            ready: false
+        },
+        {
+            lang: CodeLanguage.CS,
+            image: "csharp",
+            ready: false
+        }
+    ];
 
     const connect = async () => {
         const config = {
@@ -13,30 +27,38 @@ const dindClient = (function() {
         };
 
         await ssh.connect(config);
-
-        console.log(`Connected: ${ssh.isConnected()}`);
     }
 
-    const dockerLogin = async (user: string, password: string) => {
-        console.log(user, password);
-        
-        const result = await ssh.execCommand(`docker login ghcr.io -u ${user} -p ${password}`);
-        console.log(result);
-        
-    }
-
-    const evaluateCode = async (lang: CodeLanguage, source: string, input: string) => {
-        console.log(`Connected: ${ssh.isConnected()}`);
+    const login = async (user: string, password: string) => {
         if(!ssh.isConnected()) {
             await connect();
-            await dockerLogin(DOCKER_USER, DOCKER_PASSWORD);
         }
-        try {
-            const result = await ssh.exec(`docker run --rm ghcr.io/webler-group/clang`, [source, input]);
-            return { stdout: result ?? "No output" };
-        } catch(error: any) {
-            return { stderr: error.message }
+        const result = await ssh.execCommand(`docker login ghcr.io -u ${user} -p ${password}`);
+    }
+
+    const updateImages = async () => {
+        if(!ssh.isConnected()) {
+            await connect();
         }
+        
+        for(let runner of runners) {
+            const result = await ssh.execCommand(`docker pull ${REGISTRY}${runner.image}:latest`);
+            if(result.code == 0) {
+                runner.ready = true;
+            }
+        }
+    }
+
+    const getRunner = (language: CodeLanguage) => {
+        return runners.find(runner => runner.lang == language) ?? null;
+    }
+
+    const evaluateCode = async (image: string, source: string, input: string, exectime: number) => {
+        if(!ssh.isConnected()) {
+            await connect();
+        }
+        const result = await ssh.exec(`timeout -s 9 ${exectime}s docker run --rm -m 256m --memory-reservation=128m --cpus=1 ${REGISTRY}${image}:latest`, [source, input], { stream: 'both'});
+        return result;
     }
 
     const disconnect = () => {
@@ -45,8 +67,10 @@ const dindClient = (function() {
 
     return {
         connect,
-        dockerLogin,
+        login,
+        updateImages,
         evaluateCode,
+        getRunner,
         disconnect
     }
 })();

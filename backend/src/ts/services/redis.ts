@@ -1,9 +1,9 @@
 import Bull from "bull";
 
-const queue = new Bull('my-queue', {
+const mainQueue = new Bull('main-queue', {
     redis: { host: 'redis', port: 6379 }
 });
 
 export { 
-    queue 
+    mainQueue 
 }

@@ -182,11 +182,18 @@ model Code {
 }
 
 enum CodeLanguage {
-  HTML
-  CSS
-  JS
   C
+  CPP
+  CS
+  JAVA
   LISP
+  NODE
+  TS
+  PY
+  PHP
+  GO
+  R
+  RUST
 }
 
 model CodeVersion {

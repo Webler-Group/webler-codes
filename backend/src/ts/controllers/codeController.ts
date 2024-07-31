@@ -8,6 +8,7 @@ import ForbiddenException from "../exceptions/ForbiddenException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
 import { CodeLanguage, Role } from "@prisma/client";
 import { dindClient } from "../services/dindClient";
+import { mainQueue } from "../services/redis";
 
 /**
  * Get code template
@@ -160,9 +161,14 @@ export const getCodesByFilter = async (req: AuthRequest<getCodesByFilterSchemaTy
 }
 
 export const createCodeEvaluationTask = async (req: Request, res: Response) => {
-    const { source, input } = req.body;
+    const { language, source, input } = req.body;
 
-    const result = await dindClient.evaluateCode(CodeLanguage.C, source, input);
+    const runner = dindClient.getRunner(language);
+    if(!runner || !runner.ready) {
+        throw new Error();
+    }
+
+    const result = await dindClient.evaluateCode(language, source, input, 5);
 
     res.json(result);
 }
