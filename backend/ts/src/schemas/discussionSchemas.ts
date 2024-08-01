@@ -37,11 +37,38 @@ const getDiscussionsByFilterSchema = z.object({
     count: nonNegativeIntegerSchema.min(1).max(100)
 });
 
+const createAnswerSchema = z.object({
+  text: z.string(),
+  discussionId: idSchema
+});
+
+const deleteAnswerSchema = z.object({
+  answerId: idSchema,
+});
+
+const updateAnswerSchema = z.object({
+    answerId: idSchema,
+    text: z.string().optional(),
+});
+
+const getSortedAnswersSchema = z.object({
+    discussionId: idSchema,
+    order: z.object({
+        createdAt: orderDirectionSchema.optional(),
+    }),
+    offset: nonNegativeIntegerSchema,
+    count: nonNegativeIntegerSchema.min(1).max(100)
+});
+
 type deleteDiscussionSchemaType = z.infer<typeof deleteDiscussionSchema>;
 type getDiscussionSchemaType = z.infer<typeof getDiscussionSchema>;
 type updateDiscussionSchemaType = z.infer<typeof updateDiscussionSchema>;
 type createDiscussionSchemaType = z.infer<typeof createDiscussionSchema>;
 type getDiscussionsByFilterSchemaType = z.infer<typeof getDiscussionsByFilterSchema>;
+type createAnswerSchemaType = z.infer<typeof createAnswerSchema>;
+type deleteAnswerSchemaType = z.infer<typeof deleteAnswerSchema>;
+type updateAnswerSchemaType = z.infer<typeof updateAnswerSchema>;
+type getSortedAnswersSchemaType = z.infer<typeof getSortedAnswersSchema>;
 
 export {
     getDiscussionSchema,
@@ -49,10 +76,19 @@ export {
     deleteDiscussionSchema,
     updateDiscussionSchema,
     createDiscussionSchema,
+    createAnswerSchema,
+    deleteAnswerSchema,
+    updateAnswerSchema,
+    getSortedAnswersSchema,
 
     getDiscussionSchemaType,
     getDiscussionsByFilterSchemaType,
     deleteDiscussionSchemaType,
     updateDiscussionSchemaType,
     createDiscussionSchemaType,
+    createAnswerSchemaType,
+    deleteAnswerSchemaType,
+    updateAnswerSchemaType,
+    getSortedAnswersSchemaType,
+
 }

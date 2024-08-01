@@ -2,12 +2,14 @@ import { Response } from "express";
 import { prisma } from "../services/database";
 import { createDiscussionSchema , deleteDiscussionSchema , updateDiscussionSchema , getDiscussionSchema , getDiscussionsByFilterSchema } from "../schemas/discussionSchemas";
 import { createDiscussionSchemaType, deleteDiscussionSchemaType, updateDiscussionSchemaType, getDiscussionSchemaType, getDiscussionsByFilterSchemaType } from "../schemas/discussionSchemas";
+import { createAnswerSchema, deleteAnswerSchema, updateAnswerSchema, getSortedAnswersSchema } from "../schemas/discussionSchemas";
+import { createAnswerSchemaType, deleteAnswerSchemaType, updateAnswerSchemaType, getSortedAnswersSchemaType } from "../schemas/discussionSchemas";
 import { AuthRequest } from "../middleware/authMiddleware";
-import { defaultDiscussionSelect, findDiscussionOrThrow } from "../helpers/discussionHelper";
+import { defaultDiscussionSelect, findDiscussionOrThrow, defaultAnswerSelect, findAnswerOrThrow } from "../helpers/discussionHelper";
 import { bigintToNumber } from "../utils/utils";
 import ForbiddenException from "../exceptions/ForbiddenException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
-import { Role } from "@prisma/client";
+import { Role, PostType } from "@prisma/client";
 
 /**
  * Creates a Discussion
@@ -24,17 +26,18 @@ export const createDiscussion = async (req: AuthRequest<createDiscussionSchemaTy
       text,
       title,
       userId: currentUser.id,
-        tags: {
-          connect: tags.map((x: string) => ({ name: x }))
-        }
-      },
-      select: defaultDiscussionSelect
-    });
+      tags: {
+        connectOrCreate:
+          tags.map((x:string)=>({where:{name:x},create:{name:x,authorId:currentUser.id}}))
+      }
+    },
+    select: defaultDiscussionSelect
+  });
 
-    res.json({
-        success: true,
-        data: bigintToNumber(discussion)
-    });
+  res.json({
+    success: true,
+    data: bigintToNumber(discussion)
+  });
 }
 
 /**
@@ -49,7 +52,7 @@ export const deleteDiscussion = async (req: AuthRequest<deleteDiscussionSchemaTy
 
   let discussion = await findDiscussionOrThrow({ id: discussionId }, { id: true, userId: true });
 
-  if(!currentUser.roles.includes(Role.ADMIN) && discussion.userId != currentUser.id) {
+  if(!currentUser.roles.includes(Role.ADMIN) && discussion.user.id != currentUser.id) {
     throw new ForbiddenException("Forbidden", ErrorCode.FORBIDDEN);
   }
 
@@ -70,7 +73,7 @@ export const updateDiscussion = async (req: AuthRequest<updateDiscussionSchemaTy
 
   let discussion = await findDiscussionOrThrow({ id: discussionId }, { id: true, userId: true });
 
-  if(discussion.userId != currentUser.id) {
+  if(discussion.user.id != currentUser.id) {
     throw new ForbiddenException("Forbidden", ErrorCode.FORBIDDEN);
   }
 
@@ -128,3 +131,61 @@ export const getDiscussionsByFilter = async (req: AuthRequest<getDiscussionsByFi
   res.json(discussions.map(x => bigintToNumber(x)));
 }
 
+export const createAnswer = async (req: AuthRequest<createAnswerSchemaType>, res: Response) => {
+  createAnswerSchema.parse(req.body);
+  const { text, discussionId } = req.body;
+  const discussion = await findDiscussionOrThrow({ id: discussionId });
+  const answer = await prisma.post.create({
+    data: {
+      text,
+      postType: PostType.ANSWER,
+      userId: req.user!.id,
+      discussionId,
+      isAccepted: false
+    },
+    select: defaultAnswerSelect
+  });
+  res.json({success:true, data:bigintToNumber(answer)});
+}
+
+export const deleteAnswer = async (req: AuthRequest<deleteAnswerSchemaType>, res: Response) => {
+  deleteAnswerSchema.parse(req.body);
+  const { answerId } = req.body;
+  const answer = await findAnswerOrThrow( {id: answerId, postType: PostType.ANSWER} );
+  const currentUser = req.user!;
+  if(!currentUser.roles.includes(Role.ADMIN) && answer.user.id != currentUser.id) {
+    throw new ForbiddenException("Forbidden", ErrorCode.FORBIDDEN);
+  }
+  await prisma.post.delete({where: {id: answer.id}});
+  res.json({success: true});
+}
+
+export const updateAnswer = async (req: AuthRequest<updateAnswerSchemaType>, res: Response) => {
+  updateAnswerSchema.parse(req.body);
+  const { answerId, text } = req.body;
+  let answer = await findAnswerOrThrow( {id: answerId, postType: PostType.ANSWER} );
+  const currentUser = req.user!;
+  if(!currentUser.roles.includes(Role.ADMIN) && answer.user.id != currentUser.id) {
+    throw new ForbiddenException("Forbidden", ErrorCode.FORBIDDEN);
+  }
+  answer = await prisma.post.update({
+    where: {id: answer.id},
+    data: {text},
+    select: defaultAnswerSelect
+  });
+  res.json({success:true, data: bigintToNumber(answer)});
+}
+
+export const getSortedAnswers = async (req: AuthRequest<getSortedAnswersSchemaType>, res: Response) => {
+  getSortedAnswersSchema.parse(req.body);
+  const { discussionId, order, offset, count } = req.body;
+  const discussion = await findDiscussionOrThrow({id: discussionId});
+  const answers = await prisma.post.findMany({
+    where: {discussionId},
+    orderBy: order,
+    skip: offset,
+    take: count,
+    select:defaultAnswerSelect
+  });
+  res.json(answers.map(x=>bigintToNumber(x)));
+}
