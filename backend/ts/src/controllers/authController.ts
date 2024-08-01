@@ -15,11 +15,13 @@ import { Role } from "@prisma/client";
 import { defaultUserSelect, findUserOrThrow } from "../helpers/userHelper";
 import { bigintToNumber } from "../utils/utils";
 import { AuthRequest } from "../middleware/authMiddleware";
+import R from "../utils/resourceManager";
 
 /**
- * Create new user
- * @param req Request
- * @param res Response
+ * @param req is the request object
+ * @param res is the response object
+ *
+ * @todo rectify for test => when password is incorrect
  */
 export const register = async (req: AuthRequest<registerSchemaType>, res: Response) => {
 
@@ -29,11 +31,11 @@ export const register = async (req: AuthRequest<registerSchemaType>, res: Respon
 
     let user = await prisma.user.findFirst({ where: { username } });
     if (user) {
-        throw new BadRequestException('Username is already in use', ErrorCode.USERNAME_IS_USED);
+        throw new BadRequestException(R.strings.username_is_used, ErrorCode.USERNAME_IS_USED);
     }
     user = await prisma.user.findFirst({ where: { email } });
     if (user) {
-        throw new BadRequestException('Email is already in use', ErrorCode.EMAIL_IS_USED);
+        throw new BadRequestException(R.strings.email_is_used, ErrorCode.EMAIL_IS_USED);
     }
     user = await prisma.user.create({
         data: {
@@ -68,7 +70,7 @@ export const login = async (req: AuthRequest<loginSchemaType>, res: Response) =>
         await findUserOrThrow({ email },{ password: true, email: true });
 
     if(!user.isVerified) {
-        throw new ForbiddenException('User is not verified', ErrorCode.FORBIDDEN);
+        throw new ForbiddenException(R.strings.verify_your_account_msg, ErrorCode.FORBIDDEN);
     }
 
     if (!bcrypt.compareSync(password, user.password)) {
@@ -79,7 +81,7 @@ export const login = async (req: AuthRequest<loginSchemaType>, res: Response) =>
             }
         });
 
-        throw new BadRequestException('Password is incorrect', ErrorCode.INCORRECT_PASSWORD);
+        throw new BadRequestException(R.strings.incorrect_password, ErrorCode.INCORRECT_PASSWORD);
     }
     
     const { accessToken, info: accessTokenInfo } = generateAccessToken(user.id);
@@ -133,7 +135,7 @@ export const resendEmailVerificationCode = async (req: AuthRequest<resendEmailVe
     const user = await findUserOrThrow({ email });
 
     if (user.isVerified) {
-        throw new BadRequestException('User is already verified', ErrorCode.USER_ALREADY_VERIFIED);
+        throw new BadRequestException(R.strings.user_is_verified, ErrorCode.USER_IS_VERIFIED);
     }
 
     await generateEmailVerificationCode(user.id, user.username, user.email);
@@ -157,10 +159,10 @@ export const verifyEmail = async (req: AuthRequest<verifyEmailSchemaType>, res: 
 
     const verificationCodeRecord = await prisma.verficationCode.findFirst({ where: { userId: user.id, code } });
     if (!verificationCodeRecord) {
-        throw new NotFoundException('Verification code not found', ErrorCode.VERIFICATION_CODE_NOT_FOUND);
+        throw new NotFoundException(R.strings.verification_code_not_found, ErrorCode.VERIFICATION_CODE_NOT_FOUND);
     }
     if (Date.now() > verificationCodeRecord.validFrom.getTime() + verificationCodeRecord.expiresInMinutes * 60 * 1000) {
-        throw new BadRequestException('Verification code is expired', ErrorCode.VERIFICATION_CODE_EXPIRED);
+        throw new BadRequestException(R.strings.verification_code_expired, ErrorCode.VERIFICATION_CODE_EXPIRED);
     }
 
     await prisma.user.update({
@@ -188,12 +190,12 @@ export const refreshToken = async (req: Request<any>, res: Response) => {
     const refreshToken = req.cookies?.refreshToken;
 
     if(!refreshToken) {
-        throw new UnauthorizedException('Refresh token is not set', ErrorCode.UNAUTHORIZED);
+        throw new UnauthorizedException(R.strings.refresh_token_not_set, ErrorCode.UNAUTHORIZED);
     }
 
     jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, async (errors: jwt.VerifyErrors | null, decoded: any) => {
         if(errors) {
-            throw new UnauthorizedException('Refresh token is invalid', ErrorCode.UNAUTHORIZED)
+            throw new UnauthorizedException(R.strings.refresh_token_invalid, ErrorCode.UNAUTHORIZED)
         }
 
         const user = await getAuthenticatedUser(decoded.userId);

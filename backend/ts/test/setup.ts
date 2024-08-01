@@ -1,6 +1,6 @@
 import {Prisma, Role} from '@prisma/client';
 import * as bcrypt from "bcryptjs";
-import {prisma} from "../ts/services/database";
+import {prisma} from "../src/services/database";
 
 // environment variable setup, this is to eradicate the use of .env.test file
 // literally anything here can be changed well except the DATABASE_URL ofcourse
@@ -29,7 +29,6 @@ process.env.ADMIN_PASSWORD = "testAdminPassword";
  *      SQL (`TRUNCATE TABLE users CASCADE`)
  * then inserting the users as mentioned, respectively.
  */
-// TRUNCATE TABLE "User" RESTART IDENTITY CASCADE;
 const seedTestDatabase = async (): Promise<void> => {
     await prisma.$executeRaw`TRUNCATE TABLE "User" CASCADE;`;
 
