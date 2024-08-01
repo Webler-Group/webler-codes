@@ -24,3 +24,5 @@ export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD as string;
 
 export const DOCKER_USER = process.env.DOCKER_USER as string;
 export const DOCKER_PASSWORD = process.env.DOCKER_PASSWORD as string;
+
+export const CONTAINER_REGISTRY = "ghcr.io/webler-group";

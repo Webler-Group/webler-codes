@@ -1,8 +1,7 @@
 import { CodeLanguage } from "@prisma/client";
 import { NodeSSH } from "node-ssh";
 import { writeLogFile } from "./logger";
-
-const REGISTRY = "ghcr.io/webler-group/";
+import { CONTAINER_REGISTRY } from "../utils/globals";
 
 const dindClient = (function() {
     const ssh = new NodeSSH();
@@ -51,7 +50,7 @@ const dindClient = (function() {
         }
         
         for(let runner of runners) {
-            const result = await ssh.execCommand(`docker pull ${REGISTRY}${runner.image}:latest`);
+            const result = await ssh.execCommand(`docker pull ${CONTAINER_REGISTRY}/${runner.image}:latest`);
             if(result.code == 0) {
                 console.log(result.stdout);
             } else {
@@ -68,7 +67,7 @@ const dindClient = (function() {
         if(!ssh.isConnected()) {
             await connect();
         }
-        const result = await ssh.exec(`docker run --rm -m 256m --memory-reservation=128m --cpus=1 -q ${REGISTRY}${image}:latest ${exectime}s`, [input, source], { stream: 'both'});
+        const result = await ssh.exec(`docker run --rm -m 256m --memory-reservation=128m --cpus=1 -q ${CONTAINER_REGISTRY}/${image}:latest ${exectime}s`, [input, source], { stream: 'both'});
 
         return result;
     }
