@@ -7,21 +7,18 @@ const REGISTRY = "ghcr.io/webler-group/";
 const dindClient = (function() {
     const ssh = new NodeSSH();
 
-    const runners: { lang: CodeLanguage, image: string, ready: boolean }[] = [
+    const runners: { lang: CodeLanguage, image: string }[] = [
         {
             lang: CodeLanguage.C,
-            image: "clang",
-            ready: false
+            image: "clang"
         },
         {
             lang: CodeLanguage.CS,
-            image: "csharp",
-            ready: false
+            image: "csharp"
         },
         {
             lang: CodeLanguage.CPP,
-            image: "clang-cpp",
-            ready: false
+            image: "clang-cpp"
         }
     ];
 
@@ -56,7 +53,6 @@ const dindClient = (function() {
         for(let runner of runners) {
             const result = await ssh.execCommand(`docker pull ${REGISTRY}${runner.image}:latest`);
             if(result.code == 0) {
-                runner.ready = true;
                 console.log(result.stdout);
             } else {
                 writeLogFile(result.stderr);
@@ -72,7 +68,7 @@ const dindClient = (function() {
         if(!ssh.isConnected()) {
             await connect();
         }
-        const result = await ssh.exec(`docker run --rm -m 256m --memory-reservation=128m --cpus=1 ${REGISTRY}${image}:latest ${exectime}s`, [input, source], { stream: 'both'});
+        const result = await ssh.exec(`docker run --rm -m 256m --memory-reservation=128m --cpus=1 -q ${REGISTRY}${image}:latest ${exectime}s`, [input, source], { stream: 'both'});
 
         return result;
     }
