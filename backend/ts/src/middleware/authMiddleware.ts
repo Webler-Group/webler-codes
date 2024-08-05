@@ -5,9 +5,10 @@ import * as jwt from "jsonwebtoken";
 import { ACCESS_TOKEN_SECRET } from "../utils/globals";
 import { Role, User } from "@prisma/client";
 import { TokenPayload } from "../utils/tokenUtils";
-import { getAuthenticatedUser } from "../helpers/authHelper";
 import HttpException from "../exceptions/HttpException";
 import ForbiddenException from "../exceptions/ForbiddenException";
+import R from "../utils/resourceManager";
+import {prisma} from "../services/database";
 
 export interface AuthRequest<T> extends Request {
     body: T;
@@ -19,15 +20,15 @@ export const authMiddleware = async <T>(role: Role, req: AuthRequest<T>, res: Re
         const accessToken = req.headers.authorization;
 
         if(!accessToken) {
-            throw new UnauthorizedException('Access token is missing', ErrorCode.UNAUTHORIZED);
+            throw new UnauthorizedException(R.strings.access_token_not_set, ErrorCode.UNAUTHORIZED);
         }
 
         const payload: TokenPayload = jwt.verify(accessToken, ACCESS_TOKEN_SECRET) as any;
 
-        const user = await getAuthenticatedUser(payload.userId);
+        const user = await prisma.user.findFirst({ where: { id: payload.userId } });
 
-        if(!user.roles.includes(role)) {
-            throw new ForbiddenException('User does not have required role', ErrorCode.FORBIDDEN); 
+        if(!user || !user.isVerified || !user.roles.includes(role)) {
+            throw new ForbiddenException(R.strings.unathorized_role_msg, ErrorCode.FORBIDDEN);
         }
 
         req.user = user;

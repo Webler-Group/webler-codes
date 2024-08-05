@@ -2,6 +2,8 @@ import ForbiddenException from "../exceptions/ForbiddenException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
 import { prisma } from "../services/database";
 import { sendMail } from "../services/email";
+import {User} from "@prisma/client";
+import {AuthRequest} from "../middleware/authMiddleware";
 
 /**
  * Creates 6-digit verification code in DB and sends email
@@ -38,7 +40,7 @@ export const generateEmailVerificationCode = async (userId: bigint, username: st
  * @param userId User ID
  * @returns User
  */
-export const getAuthenticatedUser= async (userId: number | bigint) => {
+export const getUserById = async (userId: number | bigint) => {
     const user = await prisma.user.findFirst({ where: { id: userId } });
         
     if(!user || !user.isVerified) {
@@ -47,3 +49,11 @@ export const getAuthenticatedUser= async (userId: number | bigint) => {
 
     return user;
 }
+
+/**
+ * Retrieve the current authenticated user information from the token payload.
+ * This function guarantee that the authMiddleware is attaching the authenticated user
+ * to the request object.
+ * `req.user = user` // from authMiddleware
+ */
+export const getAuthenticatedUser = (req: AuthRequest<any>) => req.user as User;

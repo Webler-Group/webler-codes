@@ -10,7 +10,7 @@ authRouter.post('/register', errorHandler(register));
 authRouter.post('/login', errorHandler(login));
 authRouter.post('/resendEmailVerificationCode', errorHandler(resendEmailVerificationCode));
 authRouter.post('/verifyEmail', errorHandler(verifyEmail));
-authRouter.post('/logout', errorHandler(logout));
+authRouter.post('/logout', [authMiddleware.bind(null, Role.USER)], errorHandler(logout));
 authRouter.post('/refreshToken', errorHandler(refreshToken));
 authRouter.get('/me', [authMiddleware.bind(null, Role.USER)], errorHandler(getMe));
 

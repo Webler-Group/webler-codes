@@ -7,7 +7,7 @@ import BadRequestException from "../exceptions/BadRequestException";
 import { ErrorCode } from "../exceptions/enums/ErrorCode";
 import { loginSchema, loginSchemaType, registerSchema, registerSchemaType, resendEmailVerificationCodeSchema, resendEmailVerificationCodeSchemaType, verifyEmailSchema, verifyEmailSchemaType } from "../schemas/authSchemas";
 import NotFoundException from "../exceptions/NotFoundException";
-import { generateEmailVerificationCode, getAuthenticatedUser } from "../helpers/authHelper";
+import {generateEmailVerificationCode, getAuthenticatedUser, getUserById} from "../helpers/authHelper";
 import { clearRefreshTokenCookie, generateAccessToken, generateRefreshToken, setRefreshTokenCookie } from "../utils/tokenUtils";
 import UnauthorizedException from "../exceptions/UnauthorizedException";
 import ForbiddenException from "../exceptions/ForbiddenException";
@@ -21,7 +21,6 @@ import R from "../utils/resourceManager";
  * @param req is the request object
  * @param res is the response object
  *
- * @todo rectify for test => when password is incorrect
  */
 export const register = async (req: AuthRequest<registerSchemaType>, res: Response) => {
 
@@ -51,6 +50,7 @@ export const register = async (req: AuthRequest<registerSchemaType>, res: Respon
 
     res.json({
         success: true,
+        message: R.strings.verify_your_account_msg,
         userInfo: bigintToNumber(user)
     });
 }
@@ -119,7 +119,7 @@ export const logout = async (req: AuthRequest<{}>, res: Response) => {
         clearRefreshTokenCookie(res);
     }
 
-    res.json({});
+    res.json({ success: true, message: R.strings.logged_out_success_msg });
 }
 
 /**
@@ -198,7 +198,7 @@ export const refreshToken = async (req: Request<any>, res: Response) => {
             throw new UnauthorizedException(R.strings.refresh_token_invalid, ErrorCode.UNAUTHORIZED)
         }
 
-        const user = await getAuthenticatedUser(decoded.userId);
+        const user = await getUserById(decoded.userId);
 
         const { accessToken, info: accessTokenInfo } = generateAccessToken(user.id);
         const { refreshToken } = generateRefreshToken(user.id);

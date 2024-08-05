@@ -11,6 +11,12 @@
   "verification_code_expired": "Verification code expired",
   "refresh_token_not_set": "Refresh token is not set",
   "refresh_token_invalid": "Invalid refresh token",
+  "logged_out_failure_msg": "Authentication is required",
+  "logged_out_success_msg": "Logged out successfully",
+  "access_token_not_set": "Access token is missing",
+  "access_token_invalid": "jwt malformed",
+
+  "unathorized_role_msg": "User does not have a required role",
 
 
 

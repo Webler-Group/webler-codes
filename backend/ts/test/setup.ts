@@ -15,8 +15,8 @@ process.env.EMAIL_SECURE = "false";
 process.env.EMAIL_PORT = "587";
 process.env.EMAIL_HOST = "smtp.gmail.com";
 
-process.env.ACCESS_TOKEN_SECRET = "testAccessTokenSecret";
-process.env.REFRESH_TOKEN_SECRET = "testRefreshTokenSecret";
+process.env.ACCESS_TOKEN_SECRET = "secret1";
+process.env.REFRESH_TOKEN_SECRET = "secret2";
 
 process.env.LOG_DIR = "logs";
 process.env.ADMIN_EMAIL = "testAdmin@test.com";
@@ -62,6 +62,7 @@ const setupTestDatabase = async () => {
     }
 };
 
+// TODO: delete all test users after running test at teardownTestDatabase()
 const teardownTestDatabase = () => prisma.$disconnect();
 
 export {
