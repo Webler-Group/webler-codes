@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { idSchema } from "./typeSchemas";
+import { idSchema, nonNegativeIntegerSchema } from "./typeSchemas";
 import { prisma } from "../services/database";
 
 const createQuizSchema = z.object({
@@ -23,8 +23,20 @@ const getQuizSchema = z.object({
 
 const updateQuizQuestionsSchema = z.object({
   questions: z.object({
-    index: z.number().min(0),
+    index: nonNegativeIntegerSchema,
     text: z.string(),
+    options: z
+      .object({
+        id: idSchema,
+        question: z.string(),
+        questionId: idSchema,
+        correctAnswer: z.string(),
+        text: z.string(),
+        isCorrect: z.boolean(),
+        correctIndex: nonNegativeIntegerSchema,
+        answers: z.string().array(),
+      })
+      .array(),
   }),
   quizId: idSchema,
 });
@@ -37,8 +49,7 @@ type createQuizSchemaType = z.infer<typeof createQuizSchema>;
 type updateQuizSchemaType = z.infer<typeof updateQuizSchema>;
 type deleteQuizSchemaType = z.infer<typeof deleteQuizSchema>;
 type getQuizSchemaType = z.infer<typeof getQuizSchema>;
-
-
+type updateQuizQuestionsType = z.infer<typeof updateQuizQuestionsSchema>
 type requestQuizDraftApprovalSchemaType = z.infer<typeof requestQuizDraftApprovalSchema>;
 
 export {
@@ -50,6 +61,8 @@ export {
   deleteQuizSchemaType,
   getQuizSchema,
   getQuizSchemaType,
+  updateQuizQuestionsSchema,
+  updateQuizQuestionsType,
   requestQuizDraftApprovalSchema,
-  requestQuizDraftApprovalSchemaType
+  requestQuizDraftApprovalSchemaType,
 };

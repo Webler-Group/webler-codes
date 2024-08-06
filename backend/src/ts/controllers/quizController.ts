@@ -10,6 +10,8 @@ import {
   getQuizSchemaType,
   requestQuizDraftApprovalSchema,
   requestQuizDraftApprovalSchemaType,
+  updateQuizQuestionsSchema,
+  updateQuizQuestionsType,
   updateQuizSchema,
   updateQuizSchemaType,
 } from "../schemas/quizSchema";
@@ -144,6 +146,10 @@ const getQuiz = async (req: AuthRequest<getQuizSchemaType>, res: Response) => {
     },
   });
 };
+const updateQuizQuestions = async (req:AuthRequest<updateQuizQuestionsType> , res : Response) =>{
+  updateQuizQuestionsSchema.parse(req.body);
+  const { questions , quizId} = req.body;
+}
 
 const requestQuizDraftApproval = async (req: AuthRequest<requestQuizDraftApprovalSchemaType>, res: Response) => {
   requestQuizDraftApprovalSchema.parse(req.body);
@@ -168,4 +174,4 @@ const requestQuizDraftApproval = async (req: AuthRequest<requestQuizDraftApprova
   });
 };
 
-export { createQuiz, updateQuiz, deleteQuiz, getQuiz, requestQuizDraftApproval };
+export { createQuiz, updateQuiz, deleteQuiz, getQuiz, updateQuizQuestions,requestQuizDraftApproval };
